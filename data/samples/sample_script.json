@@ -1,0 +1,393 @@
+{
+  "project_id": "cli_sample",
+  "title": "Scandal In Bohemia Excerpt",
+  "raw_text": "To Sherlock Holmes she is always THE woman. I have seldom heard him mention her under any other name. In his eyes she eclipses and predominates the whole of her sex. It was not that he felt any emotion akin to love for Irene Adler. All emotions, and that one particularly, were abhorrent to his cold, precise but admirably balanced mind.\n\nIt was on the twentieth of March, 1888, that I was returning from a journey to a patient, for I had now returned to civil practice, when my way led me through Baker Street. As I passed the well-remembered door, I was seized with a keen desire to see Holmes again, and to know how he was employing his extraordinary powers. His rooms were brilliantly lit, and, even as I looked up, I saw his tall, spare figure pass twice in a dark silhouette against the blind. He was pacing the room swiftly, eagerly, with his head sunk upon his chest and his hands clasped behind him.\n\nA slow and heavy step, which had been heard upon the stairs and in the passage, paused immediately outside the door. Then there was a loud and authoritative tap.\n\n\"Come in!\" said Holmes.\n\nA man entered who could not have been less than six feet six inches in height, with the chest and limbs of a Hercules. His dress was rich with a richness which would, in England, be regarded as akin to bad taste. Heavy bands of astrakhan were slashed across the sleeves and fronts of his double-breasted coat.\n\n\"Pray take a seat,\" said Holmes. \"This is my friend and colleague, Dr. Watson, who is occasionally good enough to help me in my cases. Whom have I the honour to address?\"\n\n\"You may address me as the Count Von Kramm, a Bohemian nobleman,\" the visitor replied in a guttural German accent. \"I understand that this gentleman, your friend, is a man of honour and discretion, whom I may trust with a matter of the most extreme importance. If not, I should much prefer to communicate with you alone.\"\n\nI rose to go, but Holmes caught me by the wrist and pushed me back into my chair. \"It is both, or none,\" said he firmly. \"You may say before this gentleman anything which may be said to me.\"\n\nThe Count shrugged his broad shoulders. \"Then, as you will,\" he said, drawing a heavy sigh. \"I must begin by binding you both to absolute secrecy for two years; at the end of that time the matter will be of no consequence. At present it is not too much to say that it is of such weight it may influence European history.\"\n\n\"I promise,\" said Holmes.\n\n\"And I,\" said I.\n",
+  "characters": [
+    {
+      "id": "narrator",
+      "name": "Narrator",
+      "aliases": [],
+      "gender_presentation": "neutral",
+      "voice_id": null,
+      "color_accent": "#64748B"
+    },
+    {
+      "id": "character_1",
+      "name": "Character 1",
+      "aliases": [],
+      "gender_presentation": null,
+      "voice_id": null,
+      "color_accent": "#10B981"
+    },
+    {
+      "id": "holmes",
+      "name": "Holmes",
+      "aliases": [],
+      "gender_presentation": null,
+      "voice_id": null,
+      "color_accent": "#F59E0B"
+    }
+  ],
+  "lines": [
+    {
+      "id": "line_868bd0ed",
+      "line_index": 0,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": "To Sherlock Holmes she is always THE woman. I have seldom heard him mention her under any other name. In his eyes she eclipses and predominates the whole of her sex. It was not that he felt any emotion akin to love for Irene Adler. All emotions, and that one particularly, were abhorrent to his cold, precise but admirably balanced mind.\n\nIt was on the twentieth of March, 1888, that I was returning from a journey to a patient, for I had now returned to civil practice, when my way led me through Baker Street. As I passed the well-remembered door, I was seized with a keen desire to see Holmes again, and to know how he was employing his extraordinary powers. His rooms were brilliantly lit, and, even as I looked up, I saw his tall, spare figure pass twice in a dark silhouette against the blind. He was pacing the room swiftly, eagerly, with his head sunk upon his chest and his hands clasped behind him.\n\nA slow and heavy step, which had been heard upon the stairs and in the passage, paused immediately outside the door. Then there was a loud and authoritative tap.\n\n",
+      "delivery": null,
+      "sound_cues": [
+        {
+          "id": "cue_753702",
+          "tag": "footsteps",
+          "sound_file": null,
+          "placement": "before",
+          "volume_duck_db": -6.0
+        }
+      ],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_05c88ffc",
+      "line_index": 1,
+      "type": "dialogue",
+      "speaker_id": "character_1",
+      "text": "\"Come in!\"",
+      "delivery": {
+        "emotion": "emphatic, energetic",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_cb61d635",
+      "line_index": 2,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": " said Holmes.\n\nA man entered who could not have been less than six feet six inches in height, with the chest and limbs of a Hercules. His dress was rich with a richness which would, in England, be regarded as akin to bad taste. Heavy bands of astrakhan were slashed across the sleeves and fronts of his double-breasted coat.\n\n",
+      "delivery": null,
+      "sound_cues": [],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_707d5a9f",
+      "line_index": 3,
+      "type": "dialogue",
+      "speaker_id": "holmes",
+      "text": "\"Pray take a seat,\"",
+      "delivery": {
+        "emotion": "conversational",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_b11a8027",
+      "line_index": 4,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": " said Holmes. ",
+      "delivery": null,
+      "sound_cues": [],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_e6494801",
+      "line_index": 5,
+      "type": "dialogue",
+      "speaker_id": "character_1",
+      "text": "\"This is my friend and colleague, Dr. Watson, who is occasionally good enough to help me in my cases. Whom have I the honour to address?\"",
+      "delivery": {
+        "emotion": "inquisitive",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_1b16ba7b",
+      "line_index": 6,
+      "type": "dialogue",
+      "speaker_id": "holmes",
+      "text": "\"You may address me as the Count Von Kramm, a Bohemian nobleman,\"",
+      "delivery": {
+        "emotion": "conversational",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_8a99d7a8",
+      "line_index": 7,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": " the visitor replied in a guttural German accent. ",
+      "delivery": null,
+      "sound_cues": [],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_6dbc081f",
+      "line_index": 8,
+      "type": "dialogue",
+      "speaker_id": "character_1",
+      "text": "\"I understand that this gentleman, your friend, is a man of honour and discretion, whom I may trust with a matter of the most extreme importance. If not, I should much prefer to communicate with you alone.\"",
+      "delivery": {
+        "emotion": "conversational",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_e0cda3ba",
+      "line_index": 9,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": "\n\nI rose to go, but Holmes caught me by the wrist and pushed me back into my chair. ",
+      "delivery": null,
+      "sound_cues": [],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_71ca9ee7",
+      "line_index": 10,
+      "type": "dialogue",
+      "speaker_id": "holmes",
+      "text": "\"It is both, or none,\"",
+      "delivery": {
+        "emotion": "conversational",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_e6bc8da0",
+      "line_index": 11,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": " said he firmly. ",
+      "delivery": null,
+      "sound_cues": [],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_68fe6a4b",
+      "line_index": 12,
+      "type": "dialogue",
+      "speaker_id": "character_1",
+      "text": "\"You may say before this gentleman anything which may be said to me.\"",
+      "delivery": {
+        "emotion": "conversational",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_c5dd2924",
+      "line_index": 13,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": "\n\nThe Count shrugged his broad shoulders. ",
+      "delivery": null,
+      "sound_cues": [],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_e603ff0c",
+      "line_index": 14,
+      "type": "dialogue",
+      "speaker_id": "holmes",
+      "text": "\"Then, as you will,\"",
+      "delivery": {
+        "emotion": "conversational",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_2fa60873",
+      "line_index": 15,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": " he said, drawing a heavy sigh. ",
+      "delivery": null,
+      "sound_cues": [],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_727c65c4",
+      "line_index": 16,
+      "type": "dialogue",
+      "speaker_id": "character_1",
+      "text": "\"I must begin by binding you both to absolute secrecy for two years; at the end of that time the matter will be of no consequence. At present it is not too much to say that it is of such weight it may influence European history.\"",
+      "delivery": {
+        "emotion": "conversational",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_532f0d9c",
+      "line_index": 17,
+      "type": "dialogue",
+      "speaker_id": "holmes",
+      "text": "\"I promise,\"",
+      "delivery": {
+        "emotion": "conversational",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_54fff70e",
+      "line_index": 18,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": " said Holmes.\n\n",
+      "delivery": null,
+      "sound_cues": [],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_d5d523fc",
+      "line_index": 19,
+      "type": "dialogue",
+      "speaker_id": "character_1",
+      "text": "\"And I,\"",
+      "delivery": {
+        "emotion": "conversational",
+        "pace": null,
+        "volume": "normal",
+        "note": null
+      },
+      "sound_cues": [],
+      "confidence": "medium",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    },
+    {
+      "id": "line_fee8e0f1",
+      "line_index": 20,
+      "type": "narration",
+      "speaker_id": "narrator",
+      "text": " said I.",
+      "delivery": null,
+      "sound_cues": [],
+      "confidence": "high",
+      "audio_hash": null,
+      "audio_duration_ms": null,
+      "start_time_ms": null,
+      "end_time_ms": null
+    }
+  ],
+  "total_words": 456,
+  "created_at": "now",
+  "updated_at": "now"
+}
