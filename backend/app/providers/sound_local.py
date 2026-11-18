@@ -39,15 +39,16 @@ class LocalSoundCueProvider(SoundCueProvider):
         if not self.library_dir.exists():
             return None
 
-        clean_tag = cue_tag.lower().strip()
-        tag_tokens = set(re.findall(r"\w+", clean_tag))
+        clean_tag = cue_tag.lower().strip().replace("_", " ")
+        tag_tokens = set(re.findall(r"[a-zA-Z0-9]+", clean_tag))
 
         best_match = None
         best_score = 0
 
         for f in self.library_dir.iterdir():
-            if f.suffix.lower() in [".wav", ".mp3", ".ogg"]:
-                file_tokens = set(re.findall(r"\w+", f.stem.lower()))
+            if f.suffix.lower() in [".wav", ".mp3", ".ogg", ".flac", ".m4a"]:
+                clean_filename = f.stem.lower().replace("_", " ")
+                file_tokens = set(re.findall(r"[a-zA-Z0-9]+", clean_filename))
                 common = tag_tokens.intersection(file_tokens)
                 if len(common) > best_score:
                     best_score = len(common)

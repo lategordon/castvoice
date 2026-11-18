@@ -43,8 +43,11 @@ class GeminiScriptAnalyzer(ScriptAnalyzer):
     Includes offline mock mode for testing without an API key.
     """
 
-    def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-3.8-flash"):
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+    def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-3.8-flash", force_mock: bool = False):
+        if force_mock:
+            self.api_key = None
+        else:
+            self.api_key = api_key if api_key is not None else os.getenv("GEMINI_API_KEY")
         self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
         self.client = None
 
@@ -68,6 +71,41 @@ class GeminiScriptAnalyzer(ScriptAnalyzer):
             return await self._analyze_with_gemini(scene_text, existing_characters, start_line_index)
         else:
             return self._analyze_mock(scene_text, existing_characters, start_line_index)
+
+    async def analyze_podcast_conversation(
+        self,
+        article_text: str,
+        article_title: str = "Web Article",
+        host1_name: str = "Alex",
+        host2_name: str = "Jordan",
+        format_mode: str = "single_episode",
+    ) -> Tuple[List[ScriptLine], List[Character]]:
+        """
+        Transforms article text into a dynamic two-host conversational podcast (NotebookLM style).
+        """
+        if self.client:
+            return await self._analyze_podcast_with_gemini(
+                article_text, article_title, host1_name, host2_name, format_mode
+            )
+        else:
+            return self._analyze_podcast_mock(
+                article_text, article_title, host1_name, host2_name, format_mode
+            )
+
+    async def analyze_narrated_article(
+        self,
+        article_text: str,
+        article_title: str = "Web Article",
+        format_mode: str = "single_episode",
+    ) -> Tuple[List[ScriptLine], List[Character]]:
+        """
+        Transforms article text into a chaptered audiobook/audio article with section stingers
+        and distinct character attribution for direct quotes.
+        """
+        if self.client:
+            return await self._analyze_narrated_with_gemini(article_text, article_title, format_mode)
+        else:
+            return self._analyze_narrated_mock(article_text, article_title, format_mode)
 
     async def _analyze_with_gemini(
         self,
@@ -397,3 +435,358 @@ RULES:
             )
 
         return script_lines, list(characters_by_id.values())
+
+    async def _analyze_podcast_with_gemini(
+        self,
+        article_text: str,
+        article_title: str,
+        host1_name: str,
+        host2_name: str,
+        format_mode: str,
+    ) -> Tuple[List[ScriptLine], List[Character]]:
+        from google.genai import types
+        import asyncio
+
+        length_guidance = (
+            "Synthesize the entire article into a single cohesive, deeply engaging episode (approx 20-35 conversational turns)."
+            if format_mode == "single_episode"
+            else "Break the long read into a multi-part series, marking each major part/chapter clearly with transition cues."
+        )
+
+        prompt = f"""You are a master podcast producer and host adapting a longform written article into a lively, high-production two-host conversational podcast (similar to NotebookLM deep dives).
+
+### HOST ROLES:
+- **{host1_name}**: Curious, relatable, conversational, asks probing questions, frames analogies, reacts with genuine interest.
+- **{host2_name}**: Analytical, deeply informed on the material, unpacks nuance, explains evidence and mechanisms, synthesizes takeaways.
+
+### GUIDELINES:
+1. {length_guidance}
+2. The hosts should NOT just read the article; they should discuss, debate, explain, and unpack its core ideas, surprising facts, and implications with authentic conversational chemistry.
+3. Include natural dialogue interactions: back-and-forth questions, active listening affirmations ("Totally", "That's a great point", "Wait, really?"), and thoughtful pauses.
+4. On the very first line by {host1_name}, attach sound_cue_tag="podcast intro" with sound_cue_placement="before".
+5. Between major topic shifts or episode parts, attach sound_cue_tag="podcast transition" with sound_cue_placement="before".
+6. On the final concluding sign-off line, attach sound_cue_tag="podcast outro" with sound_cue_placement="after".
+7. All dialogue lines must have type="dialogue", and speaker_name must be either "{host1_name}" or "{host2_name}".
+
+### SOURCE ARTICLE:
+Title: {article_title}
+
+{article_text}
+"""
+
+        for attempt in range(3):
+            try:
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=LLMSceneAnalysisResponse,
+                        temperature=0.7,
+                    ),
+                )
+                parsed = LLMSceneAnalysisResponse.model_validate_json(response.text)
+                
+                # Pre-seed host characters with default voices
+                host1_id = slugify(host1_name)
+                host2_id = slugify(host2_name)
+                seed_chars = [
+                    Character(
+                        id=host1_id,
+                        name=host1_name,
+                        gender_presentation="male",
+                        voice_id="en-US-GuyNeural",
+                        color_accent="#3B82F6",
+                    ),
+                    Character(
+                        id=host2_id,
+                        name=host2_name,
+                        gender_presentation="female",
+                        voice_id="en-US-JennyNeural",
+                        color_accent="#EC4899",
+                    ),
+                ]
+                return self._build_script_lines_and_ledger(parsed, article_text, seed_chars, start_line_index=0)
+            except Exception as e:
+                print(f"[GeminiPodcast] Attempt {attempt + 1} failed: {e}. Retrying...")
+                await asyncio.sleep(attempt + 1)
+
+        print("[GeminiPodcast] Falling back to offline deterministic podcast generator.")
+        return self._analyze_podcast_mock(article_text, article_title, host1_name, host2_name, format_mode)
+
+    def _analyze_podcast_mock(
+        self,
+        article_text: str,
+        article_title: str,
+        host1_name: str,
+        host2_name: str,
+        format_mode: str,
+    ) -> Tuple[List[ScriptLine], List[Character]]:
+        """
+        Deterministic offline generator for two-host podcast conversations.
+        """
+        host1_id = slugify(host1_name)
+        host2_id = slugify(host2_name)
+        characters = [
+            Character(
+                id=host1_id,
+                name=host1_name,
+                gender_presentation="male",
+                voice_id="en-US-GuyNeural",
+                color_accent="#3B82F6",
+            ),
+            Character(
+                id=host2_id,
+                name=host2_name,
+                gender_presentation="female",
+                voice_id="en-US-JennyNeural",
+                color_accent="#EC4899",
+            ),
+        ]
+
+        lines: List[ScriptLine] = []
+        line_idx = 0
+
+        # Intro line
+        lines.append(
+            ScriptLine(
+                id=f"line_{uuid.uuid4().hex[:8]}",
+                line_index=line_idx,
+                type=LineType.DIALOGUE,
+                speaker_id=host1_id,
+                text=f"Welcome back to the Deep Dive! Today we're looking at '{article_title}'. {host2_name}, this piece has some really fascinating insights.",
+                delivery=DeliveryDirection(emotion="warm, enthusiastic", pace="normal"),
+                sound_cues=[
+                    SoundCue(id=f"cue_{uuid.uuid4().hex[:6]}", tag="podcast intro", placement=SoundCuePlacement.BEFORE)
+                ],
+                confidence=ConfidenceLevel.HIGH,
+            )
+        )
+        line_idx += 1
+
+        lines.append(
+            ScriptLine(
+                id=f"line_{uuid.uuid4().hex[:8]}",
+                line_index=line_idx,
+                type=LineType.DIALOGUE,
+                speaker_id=host2_id,
+                text=f"It really does, {host1_name}. What struck me most right out of the gate is how directly it addresses questions people have been wrestling with.",
+                delivery=DeliveryDirection(emotion="thoughtful, engaged"),
+                confidence=ConfidenceLevel.HIGH,
+            )
+        )
+        line_idx += 1
+
+        # Break text into paragraphs
+        raw_paragraphs = [p.strip() for p in re.split(r"\n\s*\n", article_text) if p.strip()]
+        selected_paragraphs = raw_paragraphs[:12] if format_mode == "single_episode" else raw_paragraphs
+
+        speakers = [host1_id, host2_id]
+        for i, para in enumerate(selected_paragraphs):
+            # Check for heading
+            if para.startswith("#"):
+                clean_heading = re.sub(r"^#+\s*", "", para)
+                lines.append(
+                    ScriptLine(
+                        id=f"line_{uuid.uuid4().hex[:8]}",
+                        line_index=line_idx,
+                        type=LineType.DIALOGUE,
+                        speaker_id=speakers[i % 2],
+                        text=f"That brings us to a major section here: '{clean_heading}'. Let's dig into what this means.",
+                        delivery=DeliveryDirection(emotion="curious, transitioning"),
+                        sound_cues=[
+                            SoundCue(id=f"cue_{uuid.uuid4().hex[:6]}", tag="podcast transition", placement=SoundCuePlacement.BEFORE)
+                        ],
+                        confidence=ConfidenceLevel.HIGH,
+                    )
+                )
+                line_idx += 1
+                continue
+
+            spk = speakers[i % 2]
+            other_spk = host2_name if spk == host1_id else host1_name
+            # Natural dialogue phrasing
+            if i % 3 == 0:
+                dialogue_text = f"Here's the key point: {para}"
+            elif i % 3 == 1:
+                dialogue_text = f"Right! And as the author highlights, {para}"
+            else:
+                dialogue_text = f"That makes total sense, {other_spk}. Especially when you consider that {para}"
+
+            lines.append(
+                ScriptLine(
+                    id=f"line_{uuid.uuid4().hex[:8]}",
+                    line_index=line_idx,
+                    type=LineType.DIALOGUE,
+                    speaker_id=spk,
+                    text=dialogue_text,
+                    delivery=DeliveryDirection(emotion="conversational"),
+                    confidence=ConfidenceLevel.HIGH,
+                )
+            )
+            line_idx += 1
+
+        # Outro line
+        lines.append(
+            ScriptLine(
+                id=f"line_{uuid.uuid4().hex[:8]}",
+                line_index=line_idx,
+                type=LineType.DIALOGUE,
+                speaker_id=host1_id,
+                text=f"That wraps up our deep dive into '{article_title}'. Thanks for tuning in with us, and we'll catch you on the next episode!",
+                delivery=DeliveryDirection(emotion="warm, concluding"),
+                sound_cues=[
+                    SoundCue(id=f"cue_{uuid.uuid4().hex[:6]}", tag="podcast outro", placement=SoundCuePlacement.AFTER)
+                ],
+                confidence=ConfidenceLevel.HIGH,
+            )
+        )
+
+        return lines, characters
+
+    async def _analyze_narrated_with_gemini(
+        self,
+        article_text: str,
+        article_title: str,
+        format_mode: str,
+    ) -> Tuple[List[ScriptLine], List[Character]]:
+        from google.genai import types
+        import asyncio
+
+        prompt = f"""You are a professional audiobook and audio essay producer adapting a longform written article into a polished chaptered audio reading.
+
+### GUIDELINES:
+1. Preserve the article's text faithfully in clear sequential order.
+2. The primary speaker is the "Narrator" (speaker_name="Narrator", type="narration").
+3. When direct speech or quotes appear in the text (e.g. from interviewees, experts, or quoted people), assign them to distinct speaker names with type="dialogue".
+4. Whenever a major section or heading appears in the text, attach sound_cue_tag="chapter stinger" with sound_cue_placement="before" to the line introducing that chapter.
+5. On the final concluding line, attach sound_cue_tag="podcast outro" with sound_cue_placement="after".
+
+### ARTICLE:
+Title: {article_title}
+
+{article_text}
+"""
+
+        for attempt in range(3):
+            try:
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=LLMSceneAnalysisResponse,
+                        temperature=0.2,
+                    ),
+                )
+                parsed = LLMSceneAnalysisResponse.model_validate_json(response.text)
+                return self._build_script_lines_and_ledger(parsed, article_text, [], start_line_index=0)
+            except Exception as e:
+                print(f"[GeminiNarrated] Attempt {attempt + 1} failed: {e}. Retrying...")
+                await asyncio.sleep(attempt + 1)
+
+        print("[GeminiNarrated] Falling back to offline deterministic chaptered narrator.")
+        return self._analyze_narrated_mock(article_text, article_title, format_mode)
+
+    def _analyze_narrated_mock(
+        self,
+        article_text: str,
+        article_title: str,
+        format_mode: str,
+    ) -> Tuple[List[ScriptLine], List[Character]]:
+        """
+        Deterministic offline generator for chaptered audio article narration.
+        """
+        characters_by_id: Dict[str, Character] = {
+            "narrator": Character(
+                id="narrator",
+                name="Narrator",
+                gender_presentation="neutral",
+                voice_id="en-US-GuyNeural",
+                color_accent="#64748B",
+            )
+        }
+
+        lines: List[ScriptLine] = []
+        line_idx = 0
+
+        # Title introduction line
+        lines.append(
+            ScriptLine(
+                id=f"line_{uuid.uuid4().hex[:8]}",
+                line_index=line_idx,
+                type=LineType.NARRATION,
+                speaker_id="narrator",
+                text=f"{article_title}.",
+                delivery=DeliveryDirection(emotion="formal, clear", pace="measured"),
+                sound_cues=[
+                    SoundCue(id=f"cue_{uuid.uuid4().hex[:6]}", tag="chapter stinger", placement=SoundCuePlacement.BEFORE)
+                ],
+                confidence=ConfidenceLevel.HIGH,
+            )
+        )
+        line_idx += 1
+
+        paragraphs = [p.strip() for p in re.split(r"\n\s*\n", article_text) if p.strip()]
+        for p in paragraphs:
+            if p.startswith("#"):
+                clean_heading = re.sub(r"^#+\s*", "", p)
+                lines.append(
+                    ScriptLine(
+                        id=f"line_{uuid.uuid4().hex[:8]}",
+                        line_index=line_idx,
+                        type=LineType.NARRATION,
+                        speaker_id="narrator",
+                        text=f"Chapter: {clean_heading}.",
+                        delivery=DeliveryDirection(emotion="measured"),
+                        sound_cues=[
+                            SoundCue(id=f"cue_{uuid.uuid4().hex[:6]}", tag="chapter stinger", placement=SoundCuePlacement.BEFORE)
+                        ],
+                        confidence=ConfidenceLevel.HIGH,
+                    )
+                )
+                line_idx += 1
+            else:
+                # Check if paragraph is a direct quote
+                if (p.startswith('"') and p.endswith('"')) or (p.startswith('“') and p.endswith('”')):
+                    expert_id = "quoted_expert"
+                    if expert_id not in characters_by_id:
+                        characters_by_id[expert_id] = Character(
+                            id=expert_id,
+                            name="Quoted Speaker",
+                            gender_presentation="female",
+                            voice_id="en-US-JennyNeural",
+                            color_accent="#10B981",
+                        )
+                    lines.append(
+                        ScriptLine(
+                            id=f"line_{uuid.uuid4().hex[:8]}",
+                            line_index=line_idx,
+                            type=LineType.DIALOGUE,
+                            speaker_id=expert_id,
+                            text=p,
+                            delivery=DeliveryDirection(emotion="reflective"),
+                            confidence=ConfidenceLevel.HIGH,
+                        )
+                    )
+                else:
+                    lines.append(
+                        ScriptLine(
+                            id=f"line_{uuid.uuid4().hex[:8]}",
+                            line_index=line_idx,
+                            type=LineType.NARRATION,
+                            speaker_id="narrator",
+                            text=p,
+                            delivery=DeliveryDirection(emotion="clear"),
+                            confidence=ConfidenceLevel.HIGH,
+                        )
+                    )
+                line_idx += 1
+
+        # Outro cue on the last line
+        if lines:
+            lines[-1].sound_cues.append(
+                SoundCue(id=f"cue_{uuid.uuid4().hex[:6]}", tag="podcast outro", placement=SoundCuePlacement.AFTER)
+            )
+
+        return lines, list(characters_by_id.values())

@@ -93,6 +93,76 @@ def create_starter_library(output_dir: Path):
 
     generate_wav(output_dir / "knock.wav", 1.0, knock_func)
 
+    # 6. Podcast Intro Jingle (Arpeggiated major chord with warm decay)
+    def podcast_intro_func(t, total):
+        notes = [
+            (0.1, 261.63),  # C4
+            (0.4, 329.63),  # E4
+            (0.7, 392.00),  # G4
+            (1.0, 523.25),  # C5
+            (1.4, 659.25),  # E5
+        ]
+        val = 0.0
+        for note_t, freq in notes:
+            dt = t - note_t
+            if dt >= 0:
+                env = math.exp(-dt * 2.2) * (1.0 - math.exp(-dt * 60.0))
+                val += 0.25 * env * (
+                    math.sin(2 * math.pi * freq * dt) +
+                    0.3 * math.sin(2 * math.pi * freq * 2 * dt)
+                )
+        return val
+
+    generate_wav(output_dir / "podcast_intro.wav", 3.5, podcast_intro_func)
+
+    # 7. Podcast Transition Swoosh & Chime
+    def podcast_transition_func(t, total):
+        # Soft whoosh + two bright bell chimes
+        env = math.sin(math.pi * (t / total))
+        noise = (random.random() * 2.0 - 1.0) * 0.08 * env
+        val = noise
+        for chime_t, freq in [(0.2, 587.33), (0.5, 880.00)]:
+            dt = t - chime_t
+            if dt >= 0:
+                c_env = math.exp(-dt * 4.0) * 0.35
+                val += c_env * math.sin(2 * math.pi * freq * dt)
+        return val
+
+    generate_wav(output_dir / "podcast_transition.wav", 1.8, podcast_transition_func)
+
+    # 8. Podcast Outro Theme (Resolving cadence)
+    def podcast_outro_func(t, total):
+        cadence = [
+            (0.1, 523.25),  # C5
+            (0.8, 392.00),  # G4
+            (1.5, 329.63),  # E4
+            (2.2, 261.63),  # C4
+        ]
+        val = 0.0
+        for note_t, freq in cadence:
+            dt = t - note_t
+            if dt >= 0:
+                env = math.exp(-dt * 1.5) * (1.0 - math.exp(-dt * 40.0))
+                val += 0.28 * env * (
+                    math.sin(2 * math.pi * freq * dt) +
+                    0.25 * math.sin(2 * math.pi * freq * 2 * dt)
+                )
+        return val
+
+    generate_wav(output_dir / "podcast_outro.wav", 4.0, podcast_outro_func)
+
+    # 9. Chapter Stinger (Melodic chime marker)
+    def chapter_stinger_func(t, total):
+        val = 0.0
+        for note_t, freq in [(0.05, 523.25), (0.25, 659.25), (0.45, 783.99)]:
+            dt = t - note_t
+            if dt >= 0:
+                env = math.exp(-dt * 3.5) * 0.32
+                val += env * math.sin(2 * math.pi * freq * dt)
+        return val
+
+    generate_wav(output_dir / "chapter_stinger.wav", 1.5, chapter_stinger_func)
+
     print(f"Starter sound library created in {output_dir.resolve()}")
 
 

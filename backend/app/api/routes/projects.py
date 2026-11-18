@@ -21,6 +21,20 @@ class AssignVoiceRequest(BaseModel):
     voice_id: str
 
 
+class IngestUrlRequest(BaseModel):
+    url: str
+
+
+@router.post("/ingest-url")
+def ingest_web_url(req: IngestUrlRequest):
+    try:
+        from app.services.web_extractor import WebArticleExtractor
+        data = WebArticleExtractor.extract_from_url(req.url)
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @router.get("", response_model=List[ProjectMetadata])
 def list_projects(store: ProjectStore = Depends(get_project_store)):
     return store.list_projects()

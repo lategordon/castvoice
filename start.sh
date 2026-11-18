@@ -22,8 +22,8 @@ if [ ! -f ".env" ]; then
 fi
 
 # Ensure sound library exists
-if [ ! -f "data/sound_library/rain.wav" ]; then
-    echo "Generating starter Foley sound library..."
+if [ ! -f "data/sound_library/rain.wav" ] || [ ! -f "data/sound_library/podcast_intro.wav" ]; then
+    echo "Generating starter Foley and podcast sound library..."
     PYTHONPATH=backend ./venv/bin/python3 backend/app/services/generate_starter_sounds.py
 fi
 
