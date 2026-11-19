@@ -15,6 +15,7 @@
 6. [Design Systems & Theming Commands](#6-design-systems--theming-commands)
 7. [End-to-End Operational Workflows](#7-end-to-end-operational-workflows)
 8. [Best Practices & Timeout Troubleshooting](#8-best-practices--timeout-troubleshooting)
+9. [Prompting Antigravity to Use Stitch (With Real-World Examples)](#9-prompting-antigravity-to-use-stitch-with-real-world-examples)
 
 ---
 
@@ -457,3 +458,130 @@ Converts the uploaded markdown specification into structured design system token
   - In Unix terminal: `base64 -w 0 filename.md` or `openssl base64 -A -in filename.md`.
 - **Direct Web Access**:
   - You can inspect, interact with, or organize all projects visually at any time by visiting **[https://stitch.withgoogle.com](https://stitch.withgoogle.com)**.
+
+---
+
+## 9. Prompting Antigravity to Use Stitch (With Real-World Examples)
+
+In Antigravity, you do not need to construct raw JSON tool payloads manually. You can simply ask Antigravity in natural language to perform design tasks with Stitch. Antigravity will map your request to the appropriate Stitch MCP commands, run them, and deliver the designs or code right to your workspace.
+
+Here are prompt templates and real-world examples for common design tasks:
+
+---
+
+### Example 1: Creating a Project & Generating an Initial Screen
+
+When you want to start a new design concept from a clean slate:
+
+**💬 Antigravity Prompt:**
+> *"Use Stitch to create a new project called 'CastVoice Audio Studio' and generate a desktop screen for our story ingestion workflow. It should feature a modern dark slate background (`#0B1120`), an emerald green primary button, a clean URL input bar at the top with a 'Fetch Article' action, a compact preview textarea for extracted prose, and selectable cards to choose between a 2-host conversational podcast or a chaptered audio drama."*
+
+**⚙️ What Antigravity Executes Under the Hood:**
+1. Calls `create_project` with `title: "CastVoice Audio Studio"`.
+2. Calls `generate_screen_from_text` with:
+   - `projectId`: `<newly_created_id>`
+   - `prompt`: *"Modern dark slate audio ingestion interface..."*
+   - `deviceType`: `"DESKTOP"`
+   - `modelId`: `"GEMINI_3_8_FLASH"`
+3. Calls `get_screen` to inspect the generated result and reports the screen details to you.
+
+---
+
+### Example 2: Iterating or Modifying an Existing Screen
+
+When you want to change components, fix layouts, or add new interactive elements to a screen:
+
+**💬 Antigravity Prompt:**
+> *"Using Stitch, edit the main script editor screen in project 'CastVoice Audio Studio'. Merge the 'Review Script' and 'Cast Voices' views into a single unified dual-column view: script dialogue with speaker tags on the left, and a voice audition drawer with play/stop preview buttons and voice timbre selectors on the right."*
+
+**⚙️ What Antigravity Executes Under the Hood:**
+1. Calls `list_screens` on the project to find the target screen ID.
+2. Calls `edit_screens` with:
+   - `projectId`: `<project_id>`
+   - `selectedScreenIds`: `["<screen_id>"]`
+   - `prompt`: *"Merge Review Script and Cast Voices into a unified dual-column view..."*
+
+---
+
+### Example 3: Generating Visual Variants & Layout Explorations
+
+When you want to see multiple creative options before choosing a design:
+
+**💬 Antigravity Prompt:**
+> *"In my Stitch project, generate 3 mobile variants of the voice casting modal. Let's explore different creative approaches for how the voice avatars, wave chips, and play buttons are laid out. Use the EXPLORE creative range and focus on LAYOUT and COLOR_SCHEME."*
+
+**⚙️ What Antigravity Executes Under the Hood:**
+1. Calls `generate_variants` with:
+   - `projectId`: `<project_id>`
+   - `selectedScreenIds`: `["<screen_id>"]`
+   - `prompt`: *"Explore alternative mobile voice casting layouts..."*
+   - `variantOptions`:
+     ```json
+     {
+       "variantCount": 3,
+       "creativeRange": "EXPLORE",
+       "aspects": ["LAYOUT", "COLOR_SCHEME"]
+     }
+     ```
+
+---
+
+### Example 4: Extracting Generated HTML Code & Saving Directly to Workspace
+
+When you want to take the code Stitch created and bring it into your actual codebase:
+
+**💬 Antigravity Prompt:**
+> *"Find the latest dark mode player screen in my Stitch project, download its HTML frontend code and screenshot, and save the code into `frontend/src/components/stitch/PlayerPreview.html` so we can inspect it and convert it to React."*
+
+**⚙️ What Antigravity Executes Under the Hood:**
+1. Calls `list_screens` to identify the most recent player screen.
+2. Calls `get_screen` to retrieve `htmlCode.name` (e.g. `projects/.../files/ea26...`) and `screenshot.name`.
+3. Calls `download_file` with the HTML file name.
+4. Uses `write_file` to write the received HTML directly into your repository.
+
+---
+
+### Example 5: Custom Theming & Uploading `DESIGN.md`
+
+When you have a design style guide or markdown specification you want Stitch to follow:
+
+**💬 Antigravity Prompt:**
+> *"Take our local `DESIGN.md` guidelines, upload it to our Stitch project, create a design system with Inter as the body font and Plus Jakarta Sans for headlines with rounded-xl corners, and apply this theme to all screens in the project."*
+
+**⚙️ What Antigravity Executes Under the Hood:**
+1. Reads `DESIGN.md` and encodes it in Base64.
+2. Calls `upload_design_md`.
+3. Calls `create_design_system_from_design_md`.
+4. Calls `apply_design_system` to re-skin the screens to match your brand.
+
+---
+
+### Example 6: Auditing Existing Projects & Screens
+
+When you want an overview of your Stitch assets:
+
+**💬 Antigravity Prompt:**
+> *"List all my Stitch projects and show me what screens have been generated for each."*
+
+**⚙️ What Antigravity Executes Under the Hood:**
+1. Calls `list_projects` with `filter: "view=owned"`.
+2. Iterates across projects and calls `list_screens`.
+3. Displays a structured markdown table with project titles, IDs, screen counts, and direct links to open them on `stitch.withgoogle.com`.
+
+---
+
+### 💡 Pro-Tips for Writing Prompts that Produce Great UIs in Stitch
+
+1. **Specify Viewport Early**:
+   Explicitly mention `"desktop responsive (1440px)"`, `"mobile app (390px)"`, or `"tablet"` in your prompt so Stitch selects the proper viewport container.
+2. **Describe Component Hierarchy**:
+   Structure your prompt with a clear hierarchy:
+   - Header / Navigation (breadcrumbs, title, user profile)
+   - Primary content area (cards, tables, form inputs, waveforms)
+   - Secondary actions (drawers, modals, floating action bars)
+3. **Name Your Colors & Themes**:
+   Saying `"Dark mode with Tailwind slate-900 background, emerald-500 accents, and zinc-400 muted text"` produces significantly more cohesive styling than generic words like `"make it look nice"`.
+4. **Detail Interactive States**:
+   Mention specific states: e.g. `"Include an active playing state with an animated waveform and a paused state with a muted play button."`
+5. **Ask Antigravity to Extract the Code in the Same Turn**:
+   You can chain instructions: e.g., *"Generate the screen in Stitch, then download the HTML and save it in `frontend/src/`"*. Antigravity handles the multi-step workflow seamlessly.
