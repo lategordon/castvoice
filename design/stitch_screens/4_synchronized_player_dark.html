@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-secondary-fixed-variant":"#004e5c","tertiary-container":"#b090ff","secondary-fixed":"#acedff","inverse-primary":"#006c49","on-tertiary":"#3c0091","primary":"#4edea3","on-surface-variant":"#bbcabf","surface-bright":"#323949","surface":"#0c1322","on-secondary-fixed":"#001f26","surface-tint":"#4edea3","error-container":"#93000a","error":"#ffb4ab","surface-container-high":"#232a3a","inverse-on-surface":"#293040","on-secondary":"#003640","secondary-container":"#03b5d3","surface-container-highest":"#2e3545","primary-fixed-dim":"#4edea3","surface-container-lowest":"#070e1d","background":"#0c1322","secondary-fixed-dim":"#4cd7f6","on-surface":"#dce2f7","inverse-surface":"#dce2f7","primary-container":"#10b981","outline-variant":"#3c4a42","tertiary":"#d0bcff","on-primary":"#003824","on-primary-container":"#00422b","on-error-container":"#ffdad6","on-tertiary-container":"#4600a7","surface-dim":"#0c1322","on-secondary-container":"#00424e","on-primary-fixed-variant":"#005236","surface-container-low":"#141b2b","tertiary-fixed":"#e9ddff","surface-variant":"#2e3545","on-tertiary-fixed-variant":"#5516be","on-background":"#dce2f7","surface-container":"#191f2f","secondary":"#4cd7f6","tertiary-fixed-dim":"#d0bcff","primary-fixed":"#6ffbbe","on-tertiary-fixed":"#23005c","on-primary-fixed":"#002113","outline":"#86948a","on-error":"#690005"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"gutter":"1rem","space-xl":"2.5rem","margin-desktop":"2rem","space-lg":"1.5rem","margin":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","space-md":"1rem","gutter-desktop":"1.5rem"},"fontFamily":{"body-muted":["Plus Jakarta Sans"],"body-default":["Plus Jakarta Sans"],"script-dialogue":["Newsreader"],"headline-md":["Plus Jakarta Sans"],"label-strong":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"script-title":["Newsreader"],"script-body":["Newsreader"],"label-code":["Plus Jakarta Sans"],"display-lg":["Plus Jakarta Sans"]},"fontSize":{"body-muted":["13px",{"lineHeight":"18px","fontWeight":"400"}],"body-default":["14px",{"lineHeight":"20px","fontWeight":"400"}],"script-dialogue":["17px",{"lineHeight":"28px","letterSpacing":"0em","fontWeight":"500"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-strong":["12px",{"lineHeight":"16px","letterSpacing":"0.04em","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"22px","letterSpacing":"-0.01em","fontWeight":"600"}],"script-title":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"script-body":["18px",{"lineHeight":"30px","letterSpacing":"0.005em","fontWeight":"400"}],"label-code":["11px",{"lineHeight":"14px","letterSpacing":"0.06em","fontWeight":"500"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}]}}}}</script></head><body class="bg-surface font-body-default text-body-default text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 h-16 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-outline-variant/40 shadow-[0_4px_24px_rgba(0,0,0,0.5)]"><div class="w-full h-16 px-gutter flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><div class="flex items-center gap-space-sm"><img alt="CastVoice Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrC7eM7FWAHWbklOLvEMUPJTRWGOo9ujVZrgaEC5U__IgnrqBDWYArTSVIIhG92IATNBKPonYk0okfbNrs89rmF8YlKPAp9BgiEeSjPRDg7QLcGSAo9UB0NmW-NSAM5ct6YGf5FrUR5ND3ogcatR3CCuyppVuSgIPp1HRPnxcJG_T-qNb13mcjsTqqg2I2gylisLLWGMKfJAkvBIcsN_frpGPvwEETNblIEcEzWG3SaW"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">CastVoice</span><span class="font-label-code text-label-code uppercase tracking-wider px-space-xs py-0.5 rounded-full bg-surface-container-high text-primary border border-primary/20 shadow-[0_0_8px_rgba(78,222,163,0.15)]">Studio Pro</span></div><div class="h-5 w-px bg-outline-variant/40"></div><button class="flex items-center gap-space-sm px-space-sm py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high transition-colors text-left group"><div class="flex flex-col"><div class="flex items-center gap-1"><span class="font-headline-sm text-headline-sm text-on-surface leading-none font-semibold">A Scandal in Bohemia, Ch. 1</span><span class="material-symbols-outlined text-body-muted text-on-surface-variant group-hover:text-primary transition-colors">arrow_drop_down</span></div><span class="font-label-code text-label-code text-on-surface-variant flex items-center gap-1 mt-0.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_6px_rgba(76,215,246,0.6)]"></span>Draft • 3,420 words</span></div></button></div><nav class="hidden xl:flex items-center gap-1 bg-surface-container-low p-1 rounded-full border border-outline-variant/30" data-active-classes="bg-surface-container text-on-surface font-headline-sm shadow-[0_0_12px_rgba(78,222,163,0.15)]"><a class="px-space-md py-1.5 rounded-full font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="ingest-prose" href="#">1. Ingest Prose</a><a class="px-space-md py-1.5 rounded-full font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="script-editor" href="#">2. Script Editor</a><a class="px-space-md py-1.5 rounded-full font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="cast-voices" href="#">3. Cast Voices</a><a aria-current="page" class="px-space-md py-1.5 rounded-full transition-colors bg-surface-container text-on-surface font-headline-sm shadow-[0_0_12px_rgba(78,222,163,0.15)]" data-path="render-and-play" href="#">4. Render &amp; Play</a></nav><div class="flex items-center gap-space-md shrink-0"><div class="hidden sm:flex items-center gap-space-xs text-on-surface-variant font-label-code text-label-code"><span class="material-symbols-outlined text-primary text-[18px] animate-pulse">sync</span><span>Saved</span></div><button class="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container text-primary border border-primary/40 hover:bg-primary-container hover:text-on-primary-container transition-all shadow-[0_0_16px_rgba(78,222,163,0.18)] font-label-strong text-label-strong"><span class="material-symbols-outlined text-[16px]">add</span><span>New Story</span></button><div class="flex items-center gap-space-sm pl-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjKslH7XgccrMh_S6MPti7dFAI9Hg2pNeaqR3cW2Jivim2w-1W46ZjYkSiU1ZKrgAO2WQye7yMW_RBjpVUnr0JMAYolbHqGxPVeomzSFDY88a5FiizcebneYX6rTy55BSxgtM7ABD_x_XZlCDucWhD9uIQmjcVPIsf41FBXMI4q7ruxZJuY4fo2GaR7LvkyxgXdabaUsaFSvQcGuolOTC5pTxzs66VsOYjKIHKVGQ"/></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-lowest border-r border-outline-variant/30 z-40 flex flex-col justify-between p-space-md"><div class="flex flex-col gap-space-sm"><div class="px-space-sm py-space-xs"><span class="font-label-code text-label-code uppercase tracking-wider text-outline">Workspace Explorer</span></div><nav class="flex flex-col gap-1" data-active-classes="bg-surface-container-high text-on-surface font-semibold"><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-headline-sm text-headline-sm" data-path="script-editor" href="#"><span class="material-symbols-outlined text-primary">edit_note</span>Script View</a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-headline-sm text-headline-sm" data-path="character-roster" href="#"><span class="material-symbols-outlined text-secondary">group</span>Cast Roster</a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-headline-sm text-headline-sm" data-path="sound-effects-library" href="#"><span class="material-symbols-outlined text-tertiary">graphic_eq</span>SFX &amp; Cues</a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-headline-sm text-headline-sm" data-path="audio-timeline-mastering" href="#"><span class="material-symbols-outlined text-primary">tune</span>DAW Mixer</a></nav></div><div class="flex flex-col gap-space-sm p-space-sm rounded-lg bg-surface-container-low border border-outline-variant/30"><div class="flex items-center justify-between"><span class="font-label-code text-label-code uppercase text-on-surface-variant">DSP Engine</span><span class="font-label-code text-label-code text-primary flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>48kHz 24-bit</span></div><div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden"><div class="bg-primary h-full rounded-full w-3/4 shadow-[0_0_8px_rgba(78,222,163,0.5)]"></div></div></div></aside><div class="pl-64"><main class="relative pt-16 min-h-screen bg-surface w-full"><div class="flex flex-col w-full">
+<!-- Sub-header Bar -->
+<div class="w-full bg-surface-container-lowest px-gutter-desktop py-space-sm flex flex-wrap items-center justify-between gap-space-md shadow-md">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_rgba(78,222,163,0.8)] animate-pulse"></span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Render &amp; Playback Studio</span>
+</div>
+<div class="hidden sm:flex items-center gap-2 text-on-surface-variant font-label-code text-label-code">
+<span>•</span>
+<span class="text-on-surface font-semibold tracking-wide">"A Scandal in Bohemia, Ch. 1"</span>
+<span>•</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+          Lossless 48kHz / 24-bit PCM
+        </span>
+</div>
+</div>
+<!-- Quick Utility Switches -->
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-2 bg-surface-container-low px-space-sm py-1 rounded-full shadow-inner">
+<span class="font-label-code text-label-code text-on-surface-variant">LRA: 7.4 LU</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-label-code text-label-code text-secondary font-semibold">-14.1 LUFS Integrated</span>
+</div>
+<button class="flex items-center gap-1.5 px-space-sm py-1 rounded-full bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-code text-label-code transition-all shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">spatial_audio</span>
+<span>Binaural 3D Headphone Mode</span>
+</button>
+</div>
+</div>
+<!-- Main Content Area: Split 2-Column Studio Floor -->
+<div class="grid grid-cols-1 xl:grid-cols-12 w-full gap-0 pb-36">
+<!-- Left Stage: Synchronized Interactive Transcript (Col 8) -->
+<section class="xl:col-span-8 p-gutter-desktop flex flex-col gap-space-md">
+<!-- Stage Tools Header -->
+<div class="flex items-center justify-between bg-surface-container-low/70 px-space-md py-space-sm rounded-xl shadow-sm">
+<div class="flex items-center gap-space-sm">
+<button class="flex items-center gap-2 px-space-sm py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-all font-label-strong text-label-strong" id="toggleFollowVoice">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(78,222,163,0.9)]"></span>
+<span>Follow Voice (Autoscroll)</span>
+</button>
+<span class="text-outline-variant">•</span>
+<span class="font-label-code text-label-code text-on-surface-variant">Sync Drift: ±0.8ms</span>
+</div>
+<div class="flex items-center gap-space-sm text-on-surface-variant">
+<button class="p-1 rounded hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Zoom Text In">
+<span class="material-symbols-outlined text-[18px]">format_size</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Word-level Timestamps">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Export Segment Take">
+<span class="material-symbols-outlined text-[18px]">bookmark_add</span>
+</button>
+</div>
+</div>
+<!-- Transcript Flow -->
+<div class="flex flex-col gap-space-md relative">
+<!-- Script Line 1: Past / Read (Watson) -->
+<article class="group relative flex gap-space-md p-space-md rounded-xl bg-surface-container-lowest/60 hover:bg-surface-container-lowest transition-all opacity-45 hover:opacity-80">
+<div class="flex flex-col items-center gap-1.5 shrink-0 w-24">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/20 text-secondary font-label-code text-label-code uppercase tracking-wider font-semibold">Watson</span>
+<span class="font-label-code text-label-code text-on-surface-variant">00:00 – 00:54</span>
+</div>
+<div class="flex flex-col gap-1 min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-label-code text-label-code text-on-surface-variant">Voice: Julian • Narrator Stance</span>
+<span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+</div>
+<p class="font-script-body text-script-body text-on-surface/80 italic leading-relaxed">
+              “To Sherlock Holmes she is always <span class="underline decoration-secondary/40 decoration-1 underline-offset-4">the woman</span>. I have seldom heard him mention her under any other name. In his eyes she eclipses and predominates the whole of her sex.”
+            </p>
+</div>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity self-center p-2 rounded-lg bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary shadow-sm" title="Replay Line">
+<span class="material-symbols-outlined text-[18px]">replay</span>
+</button>
+</article>
+<!-- Script Line 2: SFX Cue Past -->
+<div class="flex items-center gap-space-md px-space-md py-space-xs opacity-50">
+<div class="w-24 shrink-0 text-right">
+<span class="font-label-code text-label-code text-on-surface-variant font-mono">01:02.4</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-low px-space-md py-1.5 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary animate-pulse">volume_down</span>
+<span class="font-label-code text-label-code uppercase tracking-wider text-on-surface font-semibold">[SFX: Heavy twin brougham carriage clatters over wet granite cobblestones, pulling to sudden halt]</span>
+<span class="font-label-code text-label-code text-tertiary bg-tertiary-container/20 px-2 py-0.2 rounded-full">Foley Track 3</span>
+</div>
+</div>
+<!-- Script Line 3: ACTIVE PLAYING LINE (Holmes) -->
+<article class="relative flex flex-col gap-space-sm p-space-lg rounded-xl bg-surface-container-high/90 shadow-[0_0_32px_rgba(78,222,163,0.18)] transition-all">
+<!-- Active Line Ambient Glow Badge -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="px-2.5 py-1 rounded-full bg-tertiary/20 text-tertiary font-label-strong text-label-strong uppercase tracking-wider shadow-[0_0_12px_rgba(208,188,255,0.3)] flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-ping"></span>
+                Sherlock Holmes
+              </span>
+<span class="text-on-surface-variant font-label-code text-label-code">Voice: <strong class="text-on-surface font-semibold">Alistair (Deep Bohemian)</strong></span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-secondary-fixed font-label-code text-label-code italic">[analytical, dryly amused]</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<!-- Realtime Dynamic Equalizer Glyph -->
+<div class="flex items-end gap-0.5 h-4 px-2 py-0.5 rounded bg-surface-container-lowest">
+<span class="w-1 bg-primary rounded-t animate-[bounce_0.6s_ease-in-out_infinite] h-3"></span>
+<span class="w-1 bg-primary rounded-t animate-[bounce_0.8s_ease-in-out_infinite_0.1s] h-4"></span>
+<span class="w-1 bg-primary rounded-t animate-[bounce_0.5s_ease-in-out_infinite_0.2s] h-2"></span>
+<span class="w-1 bg-primary rounded-t animate-[bounce_0.9s_ease-in-out_infinite_0.3s] h-3.5"></span>
+</div>
+<span class="font-label-code text-label-code text-primary font-bold">01:14.22 / 03:42.00</span>
+</div>
+</div>
+<!-- Spoken Dialogue -->
+<div class="pt-1">
+<p class="font-script-title text-script-title text-on-surface leading-relaxed">
+              “A visitor at this hour, Watson. And by the sound of those horses, one of substantial consequence.”
+            </p>
+</div>
+<!-- Micro Phoneme / Wave Scrub Rail for Active Sentence -->
+<div class="mt-2 flex flex-col gap-1.5 bg-surface-container-lowest/80 p-space-sm rounded-lg shadow-inner">
+<div class="flex items-center justify-between text-on-surface-variant font-label-code text-label-code">
+<span class="text-primary font-semibold">Phoneme Alignment • Pitch +0.2 st • Formant Lock</span>
+<span>Chunk 4 of 18 • Confidence 99.4%</span>
+</div>
+<div class="relative h-6 w-full flex items-center gap-1 overflow-hidden">
+<div class="h-4 w-1/3 rounded-sm bg-primary/30 flex items-center px-2 text-primary font-label-code text-label-code truncate">“A visitor at this...”</div>
+<div class="h-5 w-1/4 rounded-sm bg-primary flex items-center px-2 text-on-primary font-label-code text-label-code font-bold shadow-[0_0_8px_rgba(78,222,163,0.5)]">hour, Watson...</div>
+<div class="h-4 w-5/12 rounded-sm bg-surface-container-high flex items-center px-2 text-on-surface-variant font-label-code text-label-code truncate">And by the sound of those horses...</div>
+</div>
+</div>
+</article>
+<!-- Script Line 4: Upcoming (Count Von Kramm) -->
+<article class="flex gap-space-md p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all">
+<div class="flex flex-col items-center gap-1.5 shrink-0 w-24">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/30 text-secondary-fixed font-label-code text-label-code uppercase tracking-wider font-semibold">Count</span>
+<span class="font-label-code text-label-code text-on-surface-variant">01:28 – 02:04</span>
+</div>
+<div class="flex flex-col gap-1 min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-label-code text-label-code text-on-surface-variant">Voice: Mikhail (Teutonic Aristocrat)</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-highest text-tertiary-fixed font-label-code text-label-code italic">[heavy accent, veiled desperation]</span>
+</div>
+<p class="font-script-body text-script-body text-on-surface leading-relaxed">
+              “I have come to you, Mr. Holmes... The matter is of the utmost delicacy. You will excuse this mask; the august person who employs me wishes his agent to remain unknown to you.”
+            </p>
+</div>
+</article>
+<!-- Script Line 5: Upcoming (Watson Narration) -->
+<article class="flex gap-space-md p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all">
+<div class="flex flex-col items-center gap-1.5 shrink-0 w-24">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/20 text-secondary font-label-code text-label-code uppercase tracking-wider font-semibold">Watson</span>
+<span class="font-label-code text-label-code text-on-surface-variant">02:05 – 02:30</span>
+</div>
+<div class="flex flex-col gap-1 min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-label-code text-label-code text-on-surface-variant">Voice: Julian • Observational Stance</span>
+</div>
+<p class="font-script-body text-script-body text-on-surface leading-relaxed">
+              Holmes leaned back in his armchair, placed his fingertips together, and closed his eyes with an air of resignation. “If your Majesty would condescend to state your case,” he remarked, “I should be better able to advise you.”
+            </p>
+</div>
+</article>
+</div>
+</section>
+<!-- Right Side Panel: Mastering, Stem Tracks & Character Mixer (Col 4) -->
+<aside class="xl:col-span-4 bg-surface-container-low p-gutter-desktop flex flex-col gap-space-lg shadow-xl">
+<!-- Mixer Header -->
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-code text-label-code uppercase tracking-wider text-outline">Digital Console</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Mastering &amp; Stem Mix</h2>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-code text-label-code shadow-sm">Reset</button>
+<button class="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-bright text-primary font-label-code text-label-code shadow-sm">Snapshot</button>
+</div>
+</div>
+<!-- Multitrack Stem Faders -->
+<div class="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md rounded-xl shadow-inner">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-strong text-label-strong uppercase text-on-surface-variant">Character Stems</span>
+<span class="font-label-code text-label-code text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">tune</span> 5 Channels Active
+          </span>
+</div>
+<!-- Stem 1: Watson -->
+<div class="flex flex-col gap-1.5 p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-label-strong text-label-strong text-on-surface">Watson (Narrator)</span>
+</div>
+<div class="flex items-center gap-1 font-label-code text-label-code">
+<span class="text-secondary font-semibold">0.0 dB</span>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant hover:text-error hover:bg-error-container/40">M</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant hover:text-primary hover:bg-primary-container/30">S</button>
+</div>
+</div>
+<div class="relative w-full h-4 flex items-center">
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 78%;"></div>
+</div>
+<div class="absolute left-[78%] -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(76,215,246,0.8)] cursor-pointer"></div>
+</div>
+</div>
+<!-- Stem 2: Holmes (Active focus) -->
+<div class="flex flex-col gap-1.5 p-space-sm rounded-lg bg-surface-container-high transition-colors shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary shadow-[0_0_8px_rgba(208,188,255,0.7)]"></span>
+<span class="font-label-strong text-label-strong text-on-surface font-bold">Sherlock Holmes</span>
+<span class="px-1.5 rounded-full bg-tertiary-container/30 text-tertiary font-label-code text-label-code">Active</span>
+</div>
+<div class="flex items-center gap-1 font-label-code text-label-code">
+<span class="text-tertiary font-bold">+1.2 dB</span>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant hover:text-error">M</button>
+<button class="px-1.5 py-0.5 rounded bg-primary-container text-on-primary-container font-bold">S</button>
+</div>
+</div>
+<div class="relative w-full h-4 flex items-center">
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 86%;"></div>
+</div>
+<div class="absolute left-[86%] -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-tertiary shadow-[0_0_10px_rgba(208,188,255,0.9)] cursor-pointer"></div>
+</div>
+</div>
+<!-- Stem 3: Count Von Kramm -->
+<div class="flex flex-col gap-1.5 p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-fixed"></span>
+<span class="font-label-strong text-label-strong text-on-surface">Count Von Kramm</span>
+</div>
+<div class="flex items-center gap-1 font-label-code text-label-code">
+<span class="text-on-surface-variant font-semibold">-0.5 dB</span>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant hover:text-error">M</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant hover:text-primary">S</button>
+</div>
+</div>
+<div class="relative w-full h-4 flex items-center">
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-fixed h-full rounded-full" style="width: 73%;"></div>
+</div>
+<div class="absolute left-[73%] -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-secondary-fixed shadow-[0_0_8px_rgba(172,237,255,0.7)] cursor-pointer"></div>
+</div>
+</div>
+<!-- Stem 4: Foley & SFX -->
+<div class="flex flex-col gap-1.5 p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">sound_detection_dog_barking</span>
+<span class="font-label-strong text-label-strong text-on-surface">SFX &amp; Foley (Carriage)</span>
+</div>
+<div class="flex items-center gap-1 font-label-code text-label-code">
+<span class="text-on-surface-variant font-semibold">-3.0 dB</span>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant hover:text-error">M</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant hover:text-primary">S</button>
+</div>
+</div>
+<div class="relative w-full h-4 flex items-center">
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 62%;"></div>
+</div>
+<div class="absolute left-[62%] -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-primary shadow-[0_0_8px_rgba(78,222,163,0.7)] cursor-pointer"></div>
+</div>
+</div>
+<!-- Stem 5: Baker St Ambient Tone -->
+<div class="flex flex-col gap-1.5 p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container">fireplace</span>
+<span class="font-label-strong text-label-strong text-on-surface">Room Tone (221B Hearth)</span>
+</div>
+<div class="flex items-center gap-1 font-label-code text-label-code">
+<span class="text-on-surface-variant font-semibold">-12.0 dB</span>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant hover:text-error">M</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant hover:text-primary">S</button>
+</div>
+</div>
+<div class="relative w-full h-4 flex items-center">
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-outline h-full rounded-full" style="width: 38%;"></div>
+</div>
+<div class="absolute left-[38%] -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-outline shadow-[0_0_6px_rgba(134,148,138,0.7)] cursor-pointer"></div>
+</div>
+</div>
+</div>
+<!-- Export & Package Hub -->
+<div class="flex flex-col gap-space-sm bg-surface-container-high/60 p-space-md rounded-xl shadow-sm">
+<span class="font-label-code text-label-code uppercase tracking-wider text-outline font-semibold">Distribution Packaging</span>
+<div class="flex flex-col gap-2">
+<!-- Option 1: Lossless Master WAV -->
+<button class="w-full flex items-center justify-between p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-highest transition-all group">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[18px]">audio_file</span>
+</div>
+<div class="flex flex-col text-left">
+<span class="font-label-strong text-label-strong text-on-surface">Export Lossless Master (WAV)</span>
+<span class="font-label-code text-label-code text-on-surface-variant">24-bit / 48kHz Broadcast Wave • 62.4 MB</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors text-[20px]">download</span>
+</button>
+<!-- Option 2: High Quality MP3 -->
+<button class="w-full flex items-center justify-between p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-highest transition-all group">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[18px]">music_note</span>
+</div>
+<div class="flex flex-col text-left">
+<span class="font-label-strong text-label-strong text-on-surface">Download High-Bitrate MP3</span>
+<span class="font-label-code text-label-code text-on-surface-variant">320kbps CBR Stereo • ID3 Tagged • 8.8 MB</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-colors text-[20px]">download</span>
+</button>
+<!-- Option 3: Script & Subtitles -->
+<button class="w-full flex items-center justify-between p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-highest transition-all group">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-tertiary/10 text-tertiary flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[18px]">subtitles</span>
+</div>
+<div class="flex flex-col text-left">
+<span class="font-label-strong text-label-strong text-on-surface">Export Script JSON / Subtitles</span>
+<span class="font-label-code text-label-code text-on-surface-variant">Synchronized SRT, WebVTT &amp; JSON Cues</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary transition-colors text-[20px]">file_download</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+<!-- Persistent Docked DAW Transport & Master Scrubber Deck -->
+<footer class="fixed bottom-0 left-64 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-2xl px-gutter-desktop py-space-sm flex flex-col gap-2 shadow-[0_-8px_32px_rgba(0,0,0,0.7)]">
+<!-- Top Row: Full Interactive Waveform Scrub Bar with Persona Bands -->
+<div class="w-full flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-code text-label-code px-1">
+<!-- Colored persona segments markers -->
+<div class="flex items-center gap-space-md">
+<span class="flex items-center gap-1 text-secondary"><span class="w-2 h-2 rounded-full bg-secondary"></span>Watson [00:00 - 01:02]</span>
+<span class="flex items-center gap-1 text-tertiary"><span class="w-2 h-2 rounded-full bg-tertiary"></span>Holmes [01:03 - 01:27]</span>
+<span class="flex items-center gap-1 text-secondary-fixed"><span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>Count [01:28 - 02:40]</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-mono text-primary font-bold">01:14</span>
+<span class="text-outline-variant">/</span>
+<span class="font-mono text-on-surface-variant">03:42</span>
+</div>
+</div>
+<!-- Waveform Canvas Mockup with Persona Regions -->
+<div class="relative h-10 w-full bg-surface-container-high rounded-lg overflow-hidden cursor-pointer group flex items-center shadow-inner">
+<!-- Persona Region Underlay Color Strips -->
+<div class="absolute inset-y-0 left-0 w-[28%] bg-secondary/10 pointer-events-none"></div>
+<div class="absolute inset-y-0 left-[28%] w-[20%] bg-tertiary/15 pointer-events-none"></div>
+<div class="absolute inset-y-0 left-[48%] w-[35%] bg-secondary-fixed/10 pointer-events-none"></div>
+<!-- Simulated SVG Waveform Peaks -->
+<svg class="w-full h-8 px-2" preserveaspectratio="none" viewbox="0 0 400 40">
+<!-- Unplayed waveform background -->
+<path d="M0,20 Q10,5 20,20 T40,20 T60,8 T80,20 T100,2 T120,20 T140,10 T160,20 T180,4 T200,20 T220,12 T240,20 T260,3 T280,20 T300,14 T320,20 T340,6 T360,20 T380,15 T400,20" fill="none" stroke="#2e3545" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Played illuminated waveform -->
+<path d="M0,20 Q10,5 20,20 T40,20 T60,8 T80,20 T100,2 T120,20 T140,10" fill="none" stroke="#4edea3" stroke-linecap="round" stroke-width="2.5"></path>
+</svg>
+<!-- Current Playhead Scrubber Diamond -->
+<div class="absolute left-[33.4%] top-0 bottom-0 w-[2px] bg-primary shadow-[0_0_12px_rgba(78,222,163,1)] flex flex-col items-center">
+<div class="w-3 h-3 bg-primary rotate-45 -mt-1 shadow-[0_0_8px_rgba(78,222,163,0.8)]"></div>
+</div>
+</div>
+</div>
+<!-- Bottom Row: Transport Deck Controls -->
+<div class="flex items-center justify-between gap-space-md">
+<!-- Track Meta Info (Left) -->
+<div class="flex items-center gap-space-md shrink-0 w-64 min-w-0">
+<div class="relative w-11 h-11 rounded-lg bg-surface-container-high overflow-hidden shrink-0 shadow-md">
+<img class="w-full h-full object-cover" data-alt="Dark Victorian detective desk in 221B Baker Street with tobacco pipe, magnifying glass, handwritten manuscript, and candle glow with emerald ambient audio waves reflection" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0syh3q_rSEnNHZKb2_2ll1xTaUo6wQ03o7MvSEOPqXcqEodgSiYzt5tTrOvfU4a6l6GcgzyBtEenrHk0JC6ejgqN0mZ_Itb6CUE5OA4yHuX_zpV-CULIhZiNRZSzNbCHx3YaFZjOSrqgIdNFbKOrmWHrt50hmd7RgBN9KGISH-z817TJZ7Nct39fc-tMPkJP1FW0Q_OGCwG1QRo6OpALfnNTaPjhwiI0k9LGZ5ss"/>
+</div>
+<div class="flex flex-col truncate">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate font-semibold">A Scandal in Bohemia</span>
+<span class="font-label-code text-label-code text-on-surface-variant truncate">Scene 1 • Holmes &amp; Watson</span>
+</div>
+</div>
+<!-- Core Transport Buttons (Center) -->
+<div class="flex flex-col items-center gap-1">
+<div class="flex items-center gap-space-md">
+<!-- Shuffle / Loop -->
+<button class="p-1.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" title="Loop Selection">
+<span class="material-symbols-outlined text-[18px]">repeat</span>
+</button>
+<!-- Skip Back 5s -->
+<button class="p-2 rounded-full text-on-surface hover:text-primary hover:bg-surface-container-high transition-colors" title="Rewind 5 Seconds">
+<span class="material-symbols-outlined text-[24px]">replay_5</span>
+</button>
+<!-- Primary Play/Pause Button -->
+<button class="w-12 h-12 rounded-full bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center shadow-[0_0_20px_rgba(78,222,163,0.4)] active:scale-95" title="Pause">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+<!-- Skip Forward 5s -->
+<button class="p-2 rounded-full text-on-surface hover:text-primary hover:bg-surface-container-high transition-colors" title="Forward 5 Seconds">
+<span class="material-symbols-outlined text-[24px]">forward_5</span>
+</button>
+<!-- Stop -->
+<button class="p-1.5 rounded-full text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors" title="Stop Playback">
+<span class="material-symbols-outlined text-[18px]">stop</span>
+</button>
+</div>
+<!-- Speed Selectors -->
+<div class="flex items-center gap-1 font-label-code text-label-code">
+<button class="px-2 py-0.5 rounded-full hover:bg-surface-container text-on-surface-variant">0.75x</button>
+<button class="px-2 py-0.5 rounded-full bg-primary text-on-primary font-bold shadow-[0_0_8px_rgba(78,222,163,0.3)]">1.0x</button>
+<button class="px-2 py-0.5 rounded-full hover:bg-surface-container text-on-surface-variant">1.25x</button>
+<button class="px-2 py-0.5 rounded-full hover:bg-surface-container text-on-surface-variant">1.5x</button>
+<button class="px-2 py-0.5 rounded-full hover:bg-surface-container text-on-surface-variant">2.0x</button>
+</div>
+</div>
+<!-- Volume & Main Export Call-to-Action (Right) -->
+<div class="flex items-center gap-space-md shrink-0 justify-end w-72">
+<!-- Master Monitor Gain -->
+<div class="flex items-center gap-2">
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">volume_up</span>
+</button>
+<div class="w-20 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full w-4/5"></div>
+</div>
+</div>
+<!-- Master Export Primary Trigger -->
+<button class="flex items-center gap-2 px-space-md py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-all shadow-[0_0_16px_rgba(78,222,163,0.3)] font-label-strong text-label-strong">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Export Master</span>
+</button>
+</div>
+</div>
+</footer>
+</div>
+<script>
+  (function() {
+    const toggle = document.getElementById('toggleFollowVoice');
+    if (toggle) {
+      toggle.addEventListener('click', function() {
+        const dot = this.querySelector('span:first-child');
+        const isActive = dot.classList.contains('bg-primary');
+        if (isActive) {
+          dot.classList.remove('bg-primary', 'shadow-[0_0_8px_rgba(78,222,163,0.9)]');
+          dot.classList.add('bg-outline');
+          this.classList.remove('text-primary', 'bg-primary/10');
+          this.classList.add('text-on-surface-variant', 'bg-surface-container-high');
+        } else {
+          dot.classList.add('bg-primary', 'shadow-[0_0_8px_rgba(78,222,163,0.9)]');
+          dot.classList.remove('bg-outline');
+          this.classList.add('text-primary', 'bg-primary/10');
+          this.classList.remove('text-on-surface-variant', 'bg-surface-container-high');
+        }
+      });
+    }
+  })();
+</script></main></div></body></html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="web_dashboard" name="shell-type">
+<title>CastVoice Studio — Ingest Prose</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#ffffff",
+            "surface-dim": "#f1f5f9",
+            "surface-bright": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f8fafc",
+            "surface-container": "#f1f5f9",
+            "surface-container-high": "#e2e8f0",
+            "surface-container-highest": "#cbd5e1",
+            "on-surface": "#0f172a",
+            "on-surface-variant": "#64748b",
+            "outline": "#94a3b8",
+            "outline-variant": "#e2e8f0",
+            "primary": "#059669",
+            "primary-container": "#ecfdf5",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#065f46",
+            "secondary": "#0284c7",
+            "secondary-container": "#f0f9ff",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#0369a1",
+            "tertiary": "#6366f1",
+            "tertiary-container": "#eef2ff",
+            "on-tertiary-container": "#4338ca",
+            "error": "#dc2626",
+            "error-container": "#fef2f2"
+          },
+          fontFamily: {
+            "sans": ["Plus Jakarta Sans", "sans-serif"],
+            "headline": ["Newsreader", "serif"],
+            "script": ["Newsreader", "serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "0.625rem",
+            "xl": "0.875rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#F8FAFC] font-sans text-on-surface text-[14px] antialiased min-h-screen flex flex-col">
+<!-- Minimalist Light Top Header -->
+<header class="fixed top-0 left-0 right-0 z-50 h-16 bg-white border-b border-outline-variant px-6 flex items-center justify-between shadow-xs">
+<div class="flex items-center gap-6">
+<!-- Brand Logo -->
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-xs">
+<span class="material-symbols-outlined text-[20px]">mic_external_on</span>
+</div>
+<span class="font-bold text-[17px] tracking-tight text-slate-900">CastVoice</span>
+</div>
+<div class="h-4 w-px bg-outline-variant"></div>
+<!-- Chapter Title Selector -->
+<div class="flex items-center gap-2 text-slate-800 font-medium">
+<span class="text-[14px]">A Scandal in Bohemia, Ch. 1</span>
+<button class="text-slate-400 hover:text-slate-600 transition-colors flex items-center">
+<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+<!-- Clean Horizontal Progress Stepper -->
+<nav class="hidden lg:flex items-center gap-1 text-[13px] font-medium bg-slate-50 border border-outline-variant p-1 rounded-full">
+<a class="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white text-emerald-700 font-semibold shadow-xs border border-emerald-100" href="#">
+<span class="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">1</span>
+<span>Ingest Prose</span>
+</a>
+<a class="flex items-center gap-1.5 px-3 py-1 rounded-full text-slate-500 hover:text-slate-800 transition-colors" href="#">
+<span class="w-4 h-4 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">2</span>
+<span>Script Editor</span>
+</a>
+<a class="flex items-center gap-1.5 px-3 py-1 rounded-full text-slate-500 hover:text-slate-800 transition-colors" href="#">
+<span class="w-4 h-4 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">3</span>
+<span>Cast Voices</span>
+</a>
+<a class="flex items-center gap-1.5 px-3 py-1 rounded-full text-slate-500 hover:text-slate-800 transition-colors" href="#">
+<span class="w-4 h-4 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">4</span>
+<span>Render &amp; Play</span>
+</a>
+</nav>
+<!-- Header Actions -->
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-semibold transition-colors shadow-xs">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>New Story</span>
+</button>
+<img alt="User Avatar" class="w-8 h-8 rounded-full border border-slate-200 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjKslH7XgccrMh_S6MPti7dFAI9Hg2pNeaqR3cW2Jivim2w-1W46ZjYkSiU1ZKrgAO2WQye7yMW_RBjpVUnr0JMAYolbHqGxPVeomzSFDY88a5FiizcebneYX6rTy55BSxgtM7ABD_x_XZlCDucWhD9uIQmjcVPIsf41FBXMI4q7ruxZJuY4fo2GaR7LvkyxgXdabaUsaFSvQcGuolOTC5pTxzs66VsOYjKIHKVGQ">
+</div>
+</header>
+<!-- Main Body Content -->
+<main class="flex-1 pt-20 pb-12 px-6 max-w-7xl mx-auto w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left / Center Primary Flow (8 Cols) -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- Ingest Mode Tabs -->
+<div class="bg-white border border-outline-variant p-1.5 rounded-xl shadow-xs flex items-center gap-1.5">
+<button class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-slate-100 text-slate-900 font-semibold text-[13px] shadow-xs transition-colors">
+<span class="material-symbols-outlined text-[18px] text-emerald-600">edit_note</span>
+<span>Paste Story Prose</span>
+</button>
+<button class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-slate-600 hover:bg-slate-50 font-medium text-[13px] transition-colors">
+<span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+<span>Import URL or EPUB</span>
+</button>
+</div>
+<!-- Project Settings Single Row -->
+<div class="bg-white border border-outline-variant p-4 rounded-xl shadow-xs">
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+<div class="sm:col-span-8 flex flex-col gap-1.5">
+<label class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Story Title</label>
+<input class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[14px] text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none transition-colors" type="text" value="A Scandal in Bohemia — Chapter 1: The Bohemian Scandal">
+</div>
+<div class="sm:col-span-4 flex flex-col gap-1.5">
+<label class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Adaptation Style</label>
+<input class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[14px] text-slate-900 focus:bg-white focus:border-emerald-600 focus:outline-none transition-colors" type="text" value="Victorian Mystery / Noir">
+</div>
+</div>
+</div>
+<!-- Production Format Selector -->
+<div class="bg-white border border-outline-variant p-4 rounded-xl shadow-xs flex flex-col gap-3"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[17px] text-emerald-600">newspaper</span><span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Article &amp; Content Type</span></div><span class="text-[12px] text-slate-400">Tailors vocal rhythm &amp; structural cadence</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5"><button type="button" class="flex flex-col text-left p-3 rounded-lg border-2 border-emerald-600 bg-emerald-50/50 transition-all cursor-pointer shadow-xs"><div class="flex items-center justify-between w-full mb-1.5"><span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[15px]">menu_book</span></span><span class="text-[10px] font-bold text-emerald-700 bg-emerald-100/90 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Active</span></div><span class="font-semibold text-[13px] text-slate-900 block">Longform Article</span><span class="text-[11px] text-slate-600 leading-snug mt-0.5">Deep-read analysis, feature journalism</span></button><button type="button" class="flex flex-col text-left p-3 rounded-lg border border-outline-variant bg-white hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer"><div class="flex items-center justify-between w-full mb-1.5"><span class="w-6 h-6 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[15px]">flash_on</span></span></div><span class="font-semibold text-[13px] text-slate-900 block">News Article</span><span class="text-[11px] text-slate-500 leading-snug mt-0.5">Brevity-focused, inverted pyramid pacing</span></button><button type="button" class="flex flex-col text-left p-3 rounded-lg border border-outline-variant bg-white hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer"><div class="flex items-center justify-between w-full mb-1.5"><span class="w-6 h-6 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[15px]">manage_search</span></span></div><span class="font-semibold text-[13px] text-slate-900 block">Investigative Report</span><span class="text-[11px] text-slate-500 leading-snug mt-0.5">Multi-source citations, interview quotes</span></button><button type="button" class="flex flex-col text-left p-3 rounded-lg border border-outline-variant bg-white hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer"><div class="flex items-center justify-between w-full mb-1.5"><span class="w-6 h-6 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[15px]">draw</span></span></div><span class="font-semibold text-[13px] text-slate-900 block">Essay &amp; Op-Ed</span><span class="text-[11px] text-slate-500 leading-snug mt-0.5">Reflective, voice-driven perspective</span></button></div></div><div>
+<div class="mb-2.5 flex items-center justify-between">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Presentation Format</span>
+<span class="text-[12px] text-slate-400">Choose acoustic staging</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+<!-- Full Cast Drama (Selected) -->
+<div class="relative bg-emerald-50/50 border-2 border-emerald-600 rounded-xl p-4 cursor-pointer transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[13px]">check</span> Selected
+                </span>
+</div>
+<h3 class="font-semibold text-slate-900 text-[14px]">Full-Cast Audio Drama</h3>
+<p class="mt-1 text-slate-600 text-[12px] leading-relaxed">Auto-segments narrator, distinct characters, and ambient background SFX cues.</p>
+</div>
+<!-- 2-Host Podcast -->
+<div class="bg-white border border-outline-variant hover:border-slate-300 rounded-xl p-4 cursor-pointer transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">podcasts</span>
+</span>
+</div>
+<h3 class="font-semibold text-slate-900 text-[14px]">2-Host Podcast</h3>
+<p class="mt-1 text-slate-500 text-[12px] leading-relaxed">Extracts dual commentary flow with natural conversational banter dynamics.</p>
+</div>
+<!-- Chaptered Narration -->
+<div class="bg-white border border-outline-variant hover:border-slate-300 rounded-xl p-4 cursor-pointer transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">auto_stories</span>
+</span>
+</div>
+<h3 class="font-semibold text-slate-900 text-[14px]">Chaptered Narration</h3>
+<p class="mt-1 text-slate-500 text-[12px] leading-relaxed">Traditional solo audiobook narration with expressive character cadence shifts.</p>
+</div>
+</div>
+</div>
+<!-- Prose Editor Preview Container -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-xs overflow-hidden flex flex-col">
+<!-- Editor Sub-Header -->
+<div class="bg-slate-50 border-b border-outline-variant px-4 py-2.5 flex items-center justify-between text-[12px] text-slate-500">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-slate-400">description</span>
+<span class="font-medium text-slate-700">Baker_Street_Ch01.txt</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="hover:text-slate-800 transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">content_copy</span> Copy
+              </button>
+<button class="hover:text-slate-800 transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">restart_alt</span> Clear
+              </button>
+</div>
+</div>
+<!-- Editorial Typography & Gutter -->
+<div class="flex bg-white min-h-[340px]">
+<!-- Line Numbers -->
+<div class="w-10 py-5 bg-slate-50/50 select-none text-right pr-3 font-mono text-[12px] text-slate-400 flex flex-col gap-2 shrink-0 border-r border-slate-100">
+<div>01</div>
+<div>02</div>
+<div>03</div>
+<div>04</div>
+<div>05</div>
+<div>06</div>
+<div>07</div>
+<div>08</div>
+<div>09</div>
+</div>
+<!-- Prose Text Canvas -->
+<div class="p-6 font-headline text-[18px] leading-[30px] text-slate-800 flex-1 overflow-y-auto">
+<p class="mb-4">
+                To Sherlock Holmes she is always <em class="text-slate-900 font-semibold">the woman</em>. I have seldom heard him mention her under any other name. In his eyes she eclipses and predominates the whole of her sex. It was not that he felt any emotion akin to love for Irene Adler. All emotions, and that one particularly, were abhorrent to his cold, precise but admirably balanced mind.
+              </p>
+<!-- Inline SFX Tag -->
+<div class="my-3 py-1 px-3 bg-emerald-50 text-emerald-800 border border-emerald-200/60 rounded-md inline-flex items-center gap-2 font-sans text-[12px]">
+<span class="material-symbols-outlined text-[15px] text-emerald-600">graphic_eq</span>
+<span>[ACOUSTIC: Carriage wheels clattering softly on wet London cobblestones]</span>
+</div>
+<p class="mb-4 mt-2">
+                “I have come to you, Mr. Holmes,” the visitor said in a deep, hollow voice, trembling with suppressed agitation. “The matter is of the utmost delicacy, and the honor of one of the royal houses of Europe is at stake.”
+              </p>
+<p class="mb-2">
+                Holmes leaned back in his armchair, unclasped his fingers, and sent a blue spiral of smoke toward the ceiling. “State your case, Count Von Kramm,” he remarked coolly. “And pray be precise as to dates and letters.”
+              </p>
+</div>
+</div>
+<!-- Word Count Footer -->
+<div class="bg-slate-50 border-t border-outline-variant px-5 py-2.5 flex items-center justify-between text-[12px] text-slate-600">
+<div class="flex items-center gap-2">
+<span class="font-medium text-slate-900">1,248 words</span>
+<span>•</span>
+<span>~8 mins runtime</span>
+</div>
+<div class="flex items-center gap-1 text-emerald-700 font-medium">
+<span class="material-symbols-outlined text-[15px]">verified</span>
+<span>100% Verbatim Extraction</span>
+</div>
+</div>
+</div>
+<!-- High-Visibility Primary CTA Button -->
+<div class="flex items-center justify-end">
+<button class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-[15px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 group">
+<span>Analyze Prose &amp; Extract Script</span>
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Right Decluttered Sidebar (4 Cols) -->
+<aside class="lg:col-span-4 flex flex-col gap-6">
+<!-- Essential Staging Settings -->
+<div class="bg-white border border-outline-variant rounded-xl p-5 shadow-xs flex flex-col gap-4">
+<h2 class="text-[14px] font-bold text-slate-900 flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-500 text-[18px]">tune</span>
+<span>Parsing Settings</span>
+</h2>
+<div class="flex flex-col gap-3.5">
+<!-- Toggle: Acoustic Ambience -->
+<div class="flex items-center justify-between gap-3">
+<div>
+<span class="block text-[13px] font-semibold text-slate-800">Detect Acoustic Ambience</span>
+<span class="block text-[12px] text-slate-500">Flags background SFX like rain and footsteps</span>
+</div>
+<button class="w-10 h-6 bg-emerald-600 rounded-full relative p-0.5 flex items-center justify-end shrink-0 transition-colors">
+<span class="w-5 h-5 bg-white rounded-full shadow-xs"></span>
+</button>
+</div>
+<div class="h-px bg-slate-100"></div>
+<!-- Toggle: Isolate Monologues -->
+<div class="flex items-center justify-between gap-3">
+<div>
+<span class="block text-[13px] font-semibold text-slate-800">Isolate Monologues</span>
+<span class="block text-[12px] text-slate-500">Separates internal thoughts from dialogue</span>
+</div>
+<button class="w-10 h-6 bg-emerald-600 rounded-full relative p-0.5 flex items-center justify-end shrink-0 transition-colors">
+<span class="w-5 h-5 bg-white rounded-full shadow-xs"></span>
+</button>
+</div>
+</div>
+</div>
+<!-- Detected Character Personas Summary Card -->
+<div class="bg-white border border-outline-variant rounded-xl p-5 shadow-xs flex flex-col gap-3.5">
+<div class="flex items-center justify-between">
+<h2 class="text-[14px] font-bold text-slate-900 flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-500 text-[18px]">group</span>
+<span>Identified Personas</span>
+</h2>
+<span class="text-[11px] font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">3 Found</span>
+</div>
+<div class="flex flex-col gap-2.5">
+<!-- Persona 1 -->
+<div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded-lg">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[12px] flex items-center justify-center">
+                  SH
+                </div>
+<div>
+<span class="block text-[13px] font-semibold text-slate-900">Sherlock Holmes</span>
+<span class="block text-[11px] text-slate-500">Protagonist • 4 lines</span>
+</div>
+</div>
+<span class="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">High Conf.</span>
+</div>
+<!-- Persona 2 -->
+<div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded-lg">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-sky-100 text-sky-800 font-bold text-[12px] flex items-center justify-center">
+                  JW
+                </div>
+<div>
+<span class="block text-[13px] font-semibold text-slate-900">Dr. John Watson</span>
+<span class="block text-[11px] text-slate-500">Narrator • 682 words</span>
+</div>
+</div>
+<span class="text-[11px] font-medium text-sky-700 bg-sky-50 px-2 py-0.5 rounded">High Conf.</span>
+</div>
+<!-- Persona 3 -->
+<div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded-lg">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-800 font-bold text-[12px] flex items-center justify-center">
+                  VK
+                </div>
+<div>
+<span class="block text-[13px] font-semibold text-slate-900">Count Von Kramm</span>
+<span class="block text-[11px] text-slate-500">Guest • 2 lines</span>
+</div>
+</div>
+<span class="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">Detected</span>
+</div>
+</div>
+</div>
+<!-- Lightweight Quality Hint -->
+<div class="p-4 rounded-xl bg-slate-100/70 border border-slate-200/80 text-[12px] text-slate-600 flex items-start gap-3">
+<span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0 mt-0.5">info</span>
+<p class="leading-relaxed">
+            Punctuation and pauses are automatically captured to preserve speech cadence for TTS voice casting in Step 3.
+          </p>
+</div>
+</aside>
+</div>
+</main>
+
+
+</body></html>

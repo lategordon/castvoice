@@ -301,23 +301,23 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
                   onClick={() => manifestLine && handleLineClick(manifestLine)}
                   className={`p-4 rounded-xl border cursor-pointer transition duration-200 ${
                     isActive
-                      ? 'bg-emerald-950/40 border-emerald-500 shadow-lg shadow-emerald-950/40 scale-[1.01]'
+                      ? 'bg-surface-container-high border-primary shadow-[0_0_24px_rgba(78,222,163,0.2)] scale-[1.01]'
                       : isNarrator
-                      ? 'bg-slate-900/40 border-slate-800/80 hover:bg-slate-900'
-                      : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                      ? 'bg-surface-container-low/60 border-outline-variant/30 hover:bg-surface-container-low'
+                      : 'bg-surface-container-low border-outline-variant/30 hover:bg-surface-container/70'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <span
-                        className="w-2.5 h-2.5 rounded-full"
-                        style={{ backgroundColor: char.color_accent || '#3B82F6' }}
+                        className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(78,222,163,0.5)]"
+                        style={{ backgroundColor: char.color_accent || '#4edea3' }}
                       />
-                      <span className="text-xs font-bold text-white">
+                      <span className="text-xs font-bold text-on-surface">
                         {char.name}
                       </span>
                       {line.delivery?.emotion && (
-                        <span className="text-[11px] text-purple-300 italic">
+                        <span className="text-[11px] text-tertiary italic">
                           ({line.delivery.emotion})
                         </span>
                       )}
@@ -325,24 +325,24 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
 
                     <div className="flex items-center gap-2">
                       {manifestLine && (
-                        <span className="text-[11px] font-mono text-slate-500">
+                        <span className="text-[11px] font-mono text-outline">
                           {formatTime(manifestLine.start_time_ms)}
                         </span>
                       )}
                       {isActive && (
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(78,222,163,0.9)] animate-pulse" />
                       )}
                     </div>
                   </div>
 
-                  <p className={`text-sm leading-relaxed ${isNarrator ? 'text-slate-300 font-serif italic' : 'text-slate-100 font-sans'}`}>
+                  <p className={`text-[17px] leading-[28px] font-serif ${isNarrator ? 'text-on-surface-variant italic font-normal' : 'text-on-surface font-medium'}`}>
                     {line.text}
                   </p>
 
                   {line.sound_cues.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {line.sound_cues.map(c => (
-                        <span key={c.id} className="text-[10px] font-mono text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
+                        <span key={c.id} className="text-[10px] font-mono text-secondary bg-secondary-container/20 px-2 py-0.5 rounded border border-secondary/30">
                           🎵 [{c.placement}: {c.tag}]
                         </span>
                       ))}

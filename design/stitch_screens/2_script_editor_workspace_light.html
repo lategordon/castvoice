@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#F8FAFC",
+            "surface-card": "#FFFFFF",
+            "border-subtle": "#E2E8F0",
+            "border-hover": "#CBD5E1",
+            "primary": "#059669",
+            "primary-hover": "#047857",
+            "primary-light": "#ECFDF5",
+            "primary-text": "#065F46",
+            "slate-text": "#0F172A",
+            "slate-muted": "#64748B",
+            "slate-light": "#94A3B8"
+          },
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "sans-serif"],
+            serif: ["Newsreader", "serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.375rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem"
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-surface font-sans text-slate-text antialiased min-h-screen flex flex-col pb-28">
+<!-- Interactive Controls Controller -->
+<script>
+    function toggleAudition(btn) {
+      const isPlaying = btn.getAttribute('data-playing') === 'true';
+      const icon = btn.querySelector('.play-icon');
+      const text = btn.querySelector('.btn-label');
+      
+      if (!isPlaying) {
+        btn.setAttribute('data-playing', 'true');
+        btn.classList.add('bg-primary', 'text-white', 'border-primary');
+        btn.classList.remove('bg-white', 'text-slate-text', 'border-border-subtle');
+        if (icon) { icon.textContent = 'pause'; icon.classList.remove('text-primary'); icon.classList.add('text-white'); }
+        if (text) text.textContent = 'Playing';
+      } else {
+        btn.setAttribute('data-playing', 'false');
+        btn.classList.remove('bg-primary', 'text-white', 'border-primary');
+        btn.classList.add('bg-white', 'text-slate-text', 'border-border-subtle');
+        if (icon) { icon.textContent = 'play_arrow'; icon.classList.add('text-primary'); icon.classList.remove('text-white'); }
+        if (text) text.textContent = 'Audition';
+      }
+    }
+
+    function resolveFlag(btn, action) {
+      const card = btn.closest('.script-card');
+      const banner = card.querySelector('.warning-banner');
+      if (banner) {
+        banner.classList.add('transition-all', 'duration-300', 'opacity-0', '-translate-y-2');
+        setTimeout(() => banner.remove(), 250);
+      }
+      const speakerBadge = card.querySelector('.speaker-name');
+      if (action === 'confirm' && speakerBadge) {
+        speakerBadge.innerHTML = 'Count Von Kramm <span class="ml-1 text-[11px] font-sans text-primary font-semibold">✓ Confirmed</span>';
+      }
+    }
+  </script>
+<!-- Clean Top Navigation Header -->
+<header class="fixed top-0 left-0 right-0 z-50 h-16 bg-white/95 backdrop-blur-md border-b border-border-subtle shadow-xs">
+<div class="w-full h-full px-6 flex items-center justify-between gap-6">
+<!-- Brand & Project Switcher -->
+<div class="flex items-center gap-5 shrink-0">
+<div class="flex items-center gap-2.5">
+<img alt="CastVoice Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrC7eM7FWAHWbklOLvEMUPJTRWGOo9ujVZrgaEC5U__IgnrqBDWYArTSVIIhG92IATNBKPonYk0okfbNrs89rmF8YlKPAp9BgiEeSjPRDg7QLcGSAo9UB0NmW-NSAM5ct6YGf5FrUR5ND3ogcatR3CCuyppVuSgIPp1HRPnxcJG_T-qNb13mcjsTqqg2I2gylisLLWGMKfJAkvBIcsN_frpGPvwEETNblIEcEzWG3SaW"/>
+<span class="font-sans text-[17px] font-bold tracking-tight text-slate-text">CastVoice</span>
+<span class="text-[11px] font-semibold text-primary bg-primary-light px-2 py-0.5 rounded-full border border-primary/20">Studio</span>
+</div>
+<div class="h-5 w-px bg-border-subtle hidden sm:block"></div>
+<!-- Story selector dropdown -->
+<button class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-subtle hover:border-border-hover bg-surface hover:bg-slate-100 transition-colors text-left group">
+<div class="flex flex-col">
+<span class="text-[13px] font-semibold text-slate-text leading-tight group-hover:text-primary transition-colors">A Scandal in Bohemia, Ch. 1</span>
+<span class="text-[11px] text-slate-muted">Draft • 3,420 words</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-slate-muted group-hover:text-slate-text">expand_more</span>
+</button>
+</div>
+<!-- Minimal 4-Step Navigation Progress -->
+<nav class="hidden lg:flex items-center gap-1.5 bg-surface p-1 rounded-xl border border-border-subtle">
+<a class="px-3.5 py-1.5 rounded-lg text-[13px] font-medium text-slate-muted hover:text-slate-text hover:bg-white transition-all" href="#">
+          1. Ingest Prose
+        </a>
+<a aria-current="page" class="px-3.5 py-1.5 rounded-lg text-[13px] font-semibold text-slate-text bg-white shadow-xs border border-border-subtle" href="#">
+          2. Script Editor
+        </a>
+<a class="px-3.5 py-1.5 rounded-lg text-[13px] font-medium text-slate-muted hover:text-slate-text hover:bg-white transition-all" href="#">
+          3. Cast Voices
+        </a>
+<a class="px-3.5 py-1.5 rounded-lg text-[13px] font-medium text-slate-muted hover:text-slate-text hover:bg-white transition-all" href="#">
+          4. Render &amp; Play
+        </a>
+</nav>
+<!-- Right Header Action Cluster -->
+<div class="flex items-center gap-4 shrink-0">
+<div class="hidden sm:flex items-center gap-1.5 text-slate-muted text-[12px] font-medium">
+<span class="material-symbols-outlined text-primary text-[17px]">cloud_done</span>
+<span>Saved</span>
+</div>
+<a class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white text-[13px] font-semibold transition-all shadow-xs hover:shadow" href="#">
+<span>Proceed to Voice Casting</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+<div class="pl-1">
+<img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjKslH7XgccrMh_S6MPti7dFAI9Hg2pNeaqR3cW2Jivim2w-1W46ZjYkSiU1ZKrgAO2WQye7yMW_RBjpVUnr0JMAYolbHqGxPVeomzSFDY88a5FiizcebneYX6rTy55BSxgtM7ABD_x_XZlCDucWhD9uIQmjcVPIsf41FBXMI4q7ruxZJuY4fo2GaR7LvkyxgXdabaUsaFSvQcGuolOTC5pTxzs66VsOYjKIHKVGQ"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Sidebar: Left Minimal Workspace Nav -->
+<aside class="fixed left-0 top-16 bottom-0 w-60 bg-white border-r border-border-subtle z-40 hidden md:flex flex-col justify-between p-4">
+<div class="flex flex-col gap-5">
+<div class="px-2 pt-2">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-slate-muted">Workspace</span>
+</div>
+<nav class="flex flex-col gap-1">
+<a aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary-light text-primary font-semibold text-[13px] transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">edit_note</span>
+<span>Script View</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-muted hover:text-slate-text hover:bg-slate-50 text-[13px] font-medium transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">group</span>
+<span>Cast Roster</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-muted hover:text-slate-text hover:bg-slate-50 text-[13px] font-medium transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">graphic_eq</span>
+<span>SFX &amp; Cues</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-muted hover:text-slate-text hover:bg-slate-50 text-[13px] font-medium transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">tune</span>
+<span>DAW Mixer</span>
+</a>
+</nav>
+</div>
+<!-- Quiet Status Card in Left Nav -->
+<div class="p-3 rounded-lg bg-surface border border-border-subtle flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-[11px] font-medium">
+<span class="text-slate-muted">Audio Engine</span>
+<span class="text-primary font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          48kHz 24-bit
+        </span>
+</div>
+<span class="text-[11px] text-slate-light">Neural voice synthesis ready</span>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<div class="md:pl-60 pt-16 flex-1 flex flex-col">
+<!-- Sub-header Filter Strip -->
+<div class="sticky top-16 z-30 bg-white/90 backdrop-blur-md border-b border-border-subtle px-8 py-3.5">
+<div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+<!-- Filter Tabs -->
+<div class="flex items-center gap-1.5">
+<button class="px-3.5 py-1.5 rounded-lg text-[13px] font-semibold bg-slate-text text-white shadow-xs">
+            All Lines (24)
+          </button>
+<button class="px-3.5 py-1.5 rounded-lg text-[13px] font-medium text-slate-muted hover:text-slate-text hover:bg-surface transition-colors">
+            Dialogue (18)
+          </button>
+<button class="px-3.5 py-1.5 rounded-lg text-[13px] font-medium text-slate-muted hover:text-slate-text hover:bg-surface transition-colors">
+            SFX Only (3)
+          </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium text-amber-800 bg-amber-50 hover:bg-amber-100 transition-colors border border-amber-200">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+<span>Flagged (1)</span>
+</button>
+</div>
+<!-- Quick Editorial Helpers -->
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle hover:border-border-hover bg-white text-slate-text hover:bg-surface transition-colors text-[12px] font-medium">
+<span class="material-symbols-outlined text-[16px] text-slate-muted">magic_button</span>
+<span>Auto-Assign Voices</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle hover:border-border-hover bg-white text-slate-text hover:bg-surface transition-colors text-[12px] font-medium">
+<span class="material-symbols-outlined text-[16px] text-slate-muted">refresh</span>
+<span>Re-parse</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Main Grid: Decluttered Script Feed + Clean Character Ledger -->
+<main class="w-full max-w-7xl mx-auto px-6 lg:px-8 py-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- LEFT / SCRIPT FEED (8 cols): Clean, spacious, literary-focused cards -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- Line Card #001: Narration (Dr. John Watson) -->
+<article class="script-card rounded-2xl bg-white border border-border-subtle p-6 hover:shadow-sm hover:border-border-hover transition-all">
+<!-- Header Meta -->
+<div class="flex items-center justify-between gap-4 pb-4 border-b border-slate-100">
+<div class="flex items-center gap-2.5 flex-wrap">
+<span class="font-mono text-[12px] font-medium text-slate-light">#001</span>
+<!-- Speaker Pill (Soft Pastel Slate/Sky) -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-50 border border-sky-100 text-sky-900">
+<span class="w-2 h-2 rounded-full bg-sky-500"></span>
+<span class="text-[12px] font-semibold">Dr. John Watson</span>
+</div>
+<!-- Type Badge -->
+<span class="text-[11px] font-medium tracking-wide uppercase px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                  Narration
+                </span>
+<!-- Subtle Tone Indicator -->
+<span class="text-[12px] italic text-slate-muted">
+                  [reflective, measured cadence]
+                </span>
+</div>
+<!-- Audition Button -->
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle bg-white hover:bg-surface text-slate-text transition-all text-[12px] font-medium shadow-xs" data-playing="false" onclick="toggleAudition(this)">
+<span class="material-symbols-outlined text-[16px] text-primary play-icon">play_arrow</span>
+<span class="btn-label">Audition</span>
+</button>
+</div>
+<!-- Dialogue / Literary Prose -->
+<div class="py-5">
+<p class="font-serif text-[19px] leading-relaxed text-slate-text select-text">
+                “To Sherlock Holmes she is always <em class="text-primary font-medium">the woman</em>. I have seldom heard him mention her under any other name. In his eyes she eclipses and predominates the whole of her sex.”
+              </p>
+</div>
+<!-- Card Footer -->
+<div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[12px] text-slate-muted">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1 text-slate-text font-medium">
+<span class="material-symbols-outlined text-[15px] text-primary">schedule</span>
+                  00:08.4s
+                </span>
+<span>•</span>
+<span>28 words</span>
+<span>•</span>
+<span>Model: Eleven British Narrator</span>
+</div>
+<button class="text-slate-light hover:text-slate-muted transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+</article>
+<!-- Line Card #002: SFX Cue Insert (Clean ambient card) -->
+<article class="script-card rounded-2xl bg-white border border-border-subtle p-5 hover:border-emerald-200 transition-all">
+<div class="flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="font-mono text-[12px] font-medium text-slate-light">#002</span>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[12px] font-semibold border border-emerald-100">
+<span class="material-symbols-outlined text-[16px] text-emerald-600">graphic_eq</span>
+<span>SFX Cue</span>
+</div>
+<span class="text-[12px] text-slate-muted font-medium">Atmosphere / Transport</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[11px] font-mono text-slate-muted bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                  4.7s
+                </span>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle bg-white hover:bg-surface text-slate-text text-[12px] font-medium transition-all" data-playing="false" onclick="toggleAudition(this)">
+<span class="material-symbols-outlined text-[16px] text-primary play-icon">play_arrow</span>
+<span class="btn-label">Audition</span>
+</button>
+</div>
+</div>
+<div class="mt-3.5 pl-7 pr-3 py-2 text-[14px] text-slate-700 bg-surface rounded-xl border border-slate-100 flex items-center justify-between">
+<span class="font-medium italic">[Heavy carriage wheels grinding on damp cobblestones, followed by two firm brass door knocks]</span>
+<span class="text-[11px] text-slate-muted uppercase font-mono tracking-wider ml-4">Stereo 48k</span>
+</div>
+</article>
+<!-- Line Card #003: Dialogue (Sherlock Holmes) -->
+<article class="script-card rounded-2xl bg-white border border-border-subtle p-6 hover:shadow-sm hover:border-border-hover transition-all">
+<div class="flex items-center justify-between gap-4 pb-4 border-b border-slate-100">
+<div class="flex items-center gap-2.5 flex-wrap">
+<span class="font-mono text-[12px] font-medium text-slate-light">#003</span>
+<!-- Speaker Pill (Soft Violet) -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-100 text-purple-900">
+<span class="w-2 h-2 rounded-full bg-purple-500"></span>
+<span class="text-[12px] font-semibold">Sherlock Holmes</span>
+</div>
+<span class="text-[11px] font-medium tracking-wide uppercase px-2 py-0.5 rounded-md bg-purple-100/60 text-purple-800">
+                  Dialogue
+                </span>
+<span class="text-[12px] italic text-slate-muted">
+                  [analytical, dryly amused]
+                </span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle bg-white hover:bg-surface text-slate-text transition-all text-[12px] font-medium shadow-xs" data-playing="false" onclick="toggleAudition(this)">
+<span class="material-symbols-outlined text-[16px] text-primary play-icon">play_arrow</span>
+<span class="btn-label">Audition</span>
+</button>
+</div>
+<!-- Dialogue -->
+<div class="py-5">
+<p class="font-serif text-[19px] leading-relaxed text-slate-text select-text">
+                “A visitor at this hour, Watson. And by the sound of those horses, one of substantial consequence.”
+              </p>
+</div>
+<div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[12px] text-slate-muted">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1 text-slate-text font-medium">
+<span class="material-symbols-outlined text-[15px] text-primary">schedule</span>
+                  00:04.9s
+                </span>
+<span>•</span>
+<span>16 words</span>
+<span>•</span>
+<span>Voice: Alistair (Sharp Aristocratic)</span>
+</div>
+<button class="text-slate-light hover:text-slate-muted transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+</article>
+<!-- Line Card #004: Ambiguous Attribution (Soft Yellow-Amber Callout Banner) -->
+<article class="script-card rounded-2xl bg-white border border-amber-200 p-6 shadow-xs transition-all">
+<!-- Clean Soft Yellow-Amber Banner -->
+<div class="warning-banner mb-5 rounded-xl bg-amber-50/80 border border-amber-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-start sm:items-center gap-2.5">
+<span class="material-symbols-outlined text-amber-600 text-[20px] shrink-0 mt-0.5 sm:mt-0">warning</span>
+<div>
+<h4 class="text-[13px] font-semibold text-amber-900 leading-tight">Ambiguous Attribution Detected (64% Confidence)</h4>
+<p class="text-[12px] text-amber-700 mt-0.5">Context switch unclear between Count Von Kramm and Wilhelm disguise.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+<button class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[12px] font-medium transition-colors shadow-xs" onclick="resolveFlag(this, 'confirm')">
+                  Confirm Count
+                </button>
+<button class="px-3 py-1.5 rounded-lg bg-white border border-amber-200 text-amber-900 hover:bg-amber-100/60 text-[12px] font-medium transition-colors" onclick="resolveFlag(this, 'assign')">
+                  Assign Holmes
+                </button>
+</div>
+</div>
+<!-- Card Header -->
+<div class="flex items-center justify-between gap-4 pb-4 border-b border-slate-100">
+<div class="flex items-center gap-2.5 flex-wrap">
+<span class="font-mono text-[12px] font-medium text-slate-light">#004</span>
+<!-- Speaker Pill (Soft Amber) -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+<span class="speaker-name text-[12px] font-semibold">Count Von Kramm / Wilhelm</span>
+</div>
+<span class="text-[11px] font-medium tracking-wide uppercase px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                  Dialogue
+                </span>
+<span class="text-[12px] italic text-slate-muted">
+                  [distressed, muffled by velvet mask]
+                </span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle bg-white hover:bg-surface text-slate-text transition-all text-[12px] font-medium shadow-xs" data-playing="false" onclick="toggleAudition(this)">
+<span class="material-symbols-outlined text-[16px] text-primary play-icon">play_arrow</span>
+<span class="btn-label">Audition</span>
+</button>
+</div>
+<!-- Dialogue -->
+<div class="py-5">
+<p class="font-serif text-[19px] leading-relaxed text-slate-text select-text">
+                “I have come to you, Mr. Holmes... The matter is of the utmost delicacy, and the honor of one of the royal houses of Europe is at stake.”
+              </p>
+</div>
+<div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[12px] text-slate-muted">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1 text-slate-text font-medium">
+<span class="material-symbols-outlined text-[15px] text-primary">schedule</span>
+                  00:06.1s
+                </span>
+<span>•</span>
+<span>24 words</span>
+<span>•</span>
+<span>Assigned Voice: Klaus (Austrian Accent)</span>
+</div>
+<button class="text-slate-light hover:text-slate-muted transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+</article>
+<!-- Line Card #005: Composite Narration + SFX -->
+<article class="script-card rounded-2xl bg-white border border-border-subtle p-6 hover:shadow-sm hover:border-border-hover transition-all">
+<div class="flex items-center justify-between gap-4 pb-4 border-b border-slate-100">
+<div class="flex items-center gap-2.5 flex-wrap">
+<span class="font-mono text-[12px] font-medium text-slate-light">#005</span>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-50 border border-sky-100 text-sky-900">
+<span class="w-2 h-2 rounded-full bg-sky-500"></span>
+<span class="text-[12px] font-semibold">Dr. John Watson</span>
+</div>
+<span class="text-[11px] font-medium tracking-wide uppercase px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                  Composite
+                </span>
+<span class="text-[12px] italic text-slate-muted">
+                  [deliberate, steady observation]
+                </span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle bg-white hover:bg-surface text-slate-text transition-all text-[12px] font-medium shadow-xs" data-playing="false" onclick="toggleAudition(this)">
+<span class="material-symbols-outlined text-[16px] text-primary play-icon">play_arrow</span>
+<span class="btn-label">Audition</span>
+</button>
+</div>
+<!-- Composite Body with Clean SFX Inline Tag -->
+<div class="py-5 flex flex-col gap-3">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-surface border border-border-subtle w-fit text-[12px] text-slate-600 font-mono">
+<span class="material-symbols-outlined text-primary text-[15px]">graphic_eq</span>
+<span>SFX: Leather armchair creaks, match strike</span>
+<span class="text-slate-light font-sans">• 1.8s</span>
+</div>
+<p class="font-serif text-[19px] leading-relaxed text-slate-text select-text">
+                “Holmes leaned back, unclasped his fingers, and sent a blue spiral of smoke toward the ceiling.”
+              </p>
+</div>
+<div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[12px] text-slate-muted">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1 text-slate-text font-medium">
+<span class="material-symbols-outlined text-[15px] text-primary">schedule</span>
+                  00:07.2s
+                </span>
+<span>•</span>
+<span>16 words + 1 cue</span>
+<span>•</span>
+<span>Crossfade: 240ms</span>
+</div>
+<button class="text-slate-light hover:text-slate-muted transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+</article>
+</div>
+<!-- RIGHT SIDEBAR (4 cols): Simplified Character Ledger & Minimal Breakdown -->
+<aside class="lg:col-span-4 flex flex-col gap-6 sticky top-36">
+<!-- Character Ledger Card -->
+<div class="rounded-2xl bg-white border border-border-subtle p-6 shadow-xs flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="text-[15px] font-semibold text-slate-text">Character Ledger</h3>
+<p class="text-[12px] text-slate-muted">3 speaking characters detected</p>
+</div>
+<button class="p-1.5 rounded-lg border border-border-subtle text-slate-muted hover:text-slate-text hover:bg-surface transition-colors" title="Add Character">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+</button>
+</div>
+<!-- List of Characters -->
+<div class="flex flex-col gap-3">
+<!-- Dr. Watson -->
+<div class="p-3 rounded-xl border border-border-subtle hover:border-slate-300 transition-colors flex items-center justify-between gap-3 bg-surface/50">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shrink-0 ring-1 ring-border-subtle" data-alt="Portrait photo of a distinguished middle-aged Victorian gentleman with a warm expression, vintage studio lighting, dark cinematic background, cyan rim light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB915HcUfZuxzLjEX8PcoYvxUct_94TeokAJ5ThqYp3Cj7QjWppqz5wt2uF2fyTPweLrXeH7UUCmwagKJ-nmhMVkYH2j28Z41zjMDlJKlsi9tbJ_q_G1WlJZaNzxf84S9Xx6GAPtw8uFpjYRWG44dsMbVMgDP5_5Pz6ExmYkoi3BTApK9SZRIXu95i3ymMXi3PNoOpZVp8Sh65AeUw3nUk-E4TsSMiNUpOsdTGw5nw"/>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] font-semibold text-slate-text truncate">Dr. John Watson</span>
+<span class="text-[12px] text-slate-muted truncate">14 lines • Guy (Warm Baritone)</span>
+</div>
+</div>
+<span class="text-[11px] font-semibold text-primary bg-primary-light px-2 py-0.5 rounded-full shrink-0">
+                  Assigned
+                </span>
+</div>
+<!-- Sherlock Holmes -->
+<div class="p-3 rounded-xl border border-border-subtle hover:border-slate-300 transition-colors flex items-center justify-between gap-3 bg-surface/50">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shrink-0 ring-1 ring-border-subtle" data-alt="Intense high-contrast portrait of a sharp-featured Victorian detective with piercing gaze, moody chiaroscuro lighting, deep purple and obsidian palette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkTxTxHWDcbptxLyGGLr8dY5KcnpbLkEfG7NP9N9KSy8RWdeJ102FVrDtvrueMf3_IJnhye4dyCEAOkb83R6lxN-FwFVozVHTDf1pPSKxleZoRc-972YVAADKW9uwTsBBZNsJnUd69BHQLoBe4G0emsJvwFxuezZx6e7Jp0jEVbOyx2iTCCBCn86VpxUmM8a_cEZVMVpaUhXajvcjyaYIit6j6MtCybOdU3CAmyMs"/>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] font-semibold text-slate-text truncate">Sherlock Holmes</span>
+<span class="text-[12px] text-slate-muted truncate">7 lines • Alistair (Sharp)</span>
+</div>
+</div>
+<span class="text-[11px] font-semibold text-primary bg-primary-light px-2 py-0.5 rounded-full shrink-0">
+                  Assigned
+                </span>
+</div>
+<!-- Count Von Kramm -->
+<div class="p-3 rounded-xl border border-border-subtle hover:border-slate-300 transition-colors flex items-center justify-between gap-3 bg-surface/50">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shrink-0 ring-1 ring-border-subtle" data-alt="Mysterious nobleman wearing a black vizard velvet mask over his eyes, opulent fur-trimmed cloak, dark ambient lighting with subtle cyan backlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARjljTilaSf3FBf4fE4_mbZVssb8uU86A7XoEp6B_lsw3f-n0UD46UxL4k5CzQhzYuNrLSdQBwkrZqjugfpbBCEO7mH6KUrj6BC02VPOIKeuf-g3lpKB_EwEqZ1j6lRXNY9L_Pt7wIbMueKnm4YsOBj5Yhe-FpvfAINMG_RTpkySDDpsOHuKVnuDHDMZGoa-W9CWcUXX1iWilb77gI09zfwDFIZgLsoCDI8cQDWS4"/>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] font-semibold text-slate-text truncate">Count Von Kramm</span>
+<span class="text-[12px] text-slate-muted truncate">3 lines • Klaus (Austrian)</span>
+</div>
+</div>
+<span class="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full shrink-0">
+                  Review
+                </span>
+</div>
+</div>
+<!-- Dialogue Percentage Breakdown -->
+<div class="pt-4 border-t border-slate-100 flex flex-col gap-3">
+<span class="text-[12px] font-semibold text-slate-muted uppercase tracking-wider">Line Distribution</span>
+<div class="space-y-2.5">
+<div>
+<div class="flex items-center justify-between text-[12px] mb-1">
+<span class="text-slate-text font-medium">Watson (Narration)</span>
+<span class="text-slate-muted font-mono font-medium">58%</span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+<div class="bg-sky-500 h-full rounded-full" style="width: 58%"></div>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between text-[12px] mb-1">
+<span class="text-slate-text font-medium">Holmes</span>
+<span class="text-slate-muted font-mono font-medium">29%</span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+<div class="bg-purple-500 h-full rounded-full" style="width: 29%"></div>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between text-[12px] mb-1">
+<span class="text-slate-text font-medium">Von Kramm</span>
+<span class="text-slate-muted font-mono font-medium">13%</span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+<div class="bg-amber-500 h-full rounded-full" style="width: 13%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Clean Non-Intrusive Merge Suggestion Card -->
+<div class="rounded-2xl bg-white border border-border-subtle p-5 shadow-xs flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-slate-muted">call_merge</span>
+<span class="text-[13px] font-semibold text-slate-text">Entity Merge Suggestion</span>
+</div>
+<span class="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">98% Match</span>
+</div>
+<p class="text-[12px] text-slate-muted leading-relaxed">
+              Entities <strong class="text-slate-text font-medium">“The Visitor”</strong> and <strong class="text-slate-text font-medium">“Count Von Kramm”</strong> share identical cadence and scene presence.
+            </p>
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 py-1.5 rounded-lg bg-surface hover:bg-slate-100 border border-border-subtle text-slate-text text-[12px] font-medium transition-colors">
+                Merge Characters
+              </button>
+<button class="px-3 py-1.5 rounded-lg text-slate-muted hover:text-slate-text text-[12px] font-medium transition-colors">
+                Dismiss
+              </button>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<!-- FLOATING BOTTOM AUDIO DOCK: Sleek, Minimal, Standard Light Mode -->
+<div class="fixed bottom-5 left-4 right-4 md:left-64 z-50 max-w-4xl mx-auto pointer-events-none">
+<div class="pointer-events-auto rounded-2xl bg-white/95 backdrop-blur-xl border border-border-subtle px-5 py-3 shadow-xl flex items-center justify-between gap-5">
+<!-- Current Playing Info -->
+<div class="flex items-center gap-3.5 min-w-0">
+<button class="w-10 h-10 rounded-full bg-primary hover:bg-primary-hover text-white flex items-center justify-center shadow-xs transition-all shrink-0">
+<span class="material-symbols-outlined text-[22px]">play_arrow</span>
+</button>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="text-[13px] font-semibold text-slate-text truncate">Line #001 • Dr. John Watson</span>
+<span class="text-[10px] font-medium text-primary bg-primary-light px-1.5 py-0.5 rounded uppercase">Auditioning</span>
+</div>
+<span class="text-[11px] text-slate-muted font-mono">00:03.4 / 00:08.4</span>
+</div>
+</div>
+<!-- Scrub Slider Bar -->
+<div class="hidden sm:flex flex-1 items-center gap-3 max-w-md px-2">
+<div class="relative w-full h-1.5 bg-slate-100 rounded-full overflow-hidden cursor-pointer group">
+<div class="absolute left-0 top-0 bottom-0 bg-primary w-2/5 rounded-full group-hover:bg-primary-hover transition-colors"></div>
+</div>
+</div>
+<!-- Playback Controls & Volume -->
+<div class="flex items-center gap-3 shrink-0">
+<div class="flex items-center gap-1 text-slate-muted">
+<button class="p-1 rounded-lg hover:text-slate-text hover:bg-slate-100 transition-colors" title="Loop">
+<span class="material-symbols-outlined text-[18px]">repeat</span>
+</button>
+<button class="p-1 rounded-lg hover:text-slate-text hover:bg-slate-100 transition-colors" title="Rewind 5s">
+<span class="material-symbols-outlined text-[18px]">replay_5</span>
+</button>
+<button class="p-1 rounded-lg hover:text-slate-text hover:bg-slate-100 transition-colors" title="Forward 5s">
+<span class="material-symbols-outlined text-[18px]">forward_5</span>
+</button>
+</div>
+<div class="h-4 w-px bg-border-subtle"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-slate-muted">volume_up</span>
+<div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden cursor-pointer">
+<div class="w-3/4 h-full bg-slate-400 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,110 @@
+[
+  {
+    "id": "cf627aa5fcf14c21b990aada02417173",
+    "label": "1_ingest_prose_analysis_dark",
+    "title": "1. Ingest & Prose Analysis \u2014 CastVoice",
+    "image": "design/stitch_screens/1_ingest_prose_analysis_dark.png",
+    "html": "design/stitch_screens/1_ingest_prose_analysis_dark.html",
+    "image_size_kb": 1346.8,
+    "html_size_kb": 35.2
+  },
+  {
+    "id": "69e20ed8044c49e6a9dbd3d316b00ad9",
+    "label": "2_script_editor_workspace_dark",
+    "title": "2. Script Editor Workspace \u2014 CastVoice",
+    "image": "design/stitch_screens/2_script_editor_workspace_dark.png",
+    "html": "design/stitch_screens/2_script_editor_workspace_dark.html",
+    "image_size_kb": 1112.5,
+    "html_size_kb": 46.3
+  },
+  {
+    "id": "3c3e60bd64034158914229d740a51d77",
+    "label": "3_voice_casting_room_dark",
+    "title": "3. Voice Casting Room \u2014 CastVoice",
+    "image": "design/stitch_screens/3_voice_casting_room_dark.png",
+    "html": "design/stitch_screens/3_voice_casting_room_dark.html",
+    "image_size_kb": 1386.4,
+    "html_size_kb": 48.8
+  },
+  {
+    "id": "c0218df1734142ac9d7aa9a9d51822e2",
+    "label": "1_ingest_prose_analysis_light",
+    "title": "1. Ingest & Prose Analysis \u2014 CastVoice (Light Mode)",
+    "image": "design/stitch_screens/1_ingest_prose_analysis_light.png",
+    "html": "design/stitch_screens/1_ingest_prose_analysis_light.html",
+    "image_size_kb": 581.7,
+    "html_size_kb": 20.9
+  },
+  {
+    "id": "eb88db7162ac4f278e5e0e344db92356",
+    "label": "3_voice_casting_room_light",
+    "title": "3. Voice Casting Room \u2014 CastVoice (Light Mode)",
+    "image": "design/stitch_screens/3_voice_casting_room_light.png",
+    "html": "design/stitch_screens/3_voice_casting_room_light.html",
+    "image_size_kb": 577.5,
+    "html_size_kb": 37.8
+  },
+  {
+    "id": "913abe18cbb645d195bddef169261e25",
+    "label": "2_script_editor_workspace_light",
+    "title": "2. Script Editor Workspace \u2014 CastVoice (Light Mode)",
+    "image": "design/stitch_screens/2_script_editor_workspace_light.png",
+    "html": "design/stitch_screens/2_script_editor_workspace_light.html",
+    "image_size_kb": 987.6,
+    "html_size_kb": 32.5
+  },
+  {
+    "id": "1d70a62ea1ca4483aa730c4b16ffd5dd",
+    "label": "4_synchronized_player_dark",
+    "title": "4. Synchronized Audio Player & Transcript \u2014 CastVoice",
+    "image": "design/stitch_screens/4_synchronized_player_dark.png",
+    "html": "design/stitch_screens/4_synchronized_player_dark.html",
+    "image_size_kb": 1075.5,
+    "html_size_kb": 39.1
+  },
+  {
+    "id": "9598743894074d30a0e28609459ee95e",
+    "label": "4_synchronized_player_light",
+    "title": "4. Synchronized Audio Player & Transcript \u2014 CastVoice (Light Mode)",
+    "image": "design/stitch_screens/4_synchronized_player_light.png",
+    "html": "design/stitch_screens/4_synchronized_player_light.html",
+    "image_size_kb": 840.4,
+    "html_size_kb": 28.0
+  },
+  {
+    "id": "e99fdfe150f5427c910c799be3063fa8",
+    "label": "1_ingest_mobile_dark",
+    "title": "1. Ingest & Prose Analysis (Mobile Dark Mode)",
+    "image": "design/stitch_screens/1_ingest_mobile_dark.png",
+    "html": "design/stitch_screens/1_ingest_mobile_dark.html",
+    "image_size_kb": 1131.7,
+    "html_size_kb": 28.0
+  },
+  {
+    "id": "c8c4c057fbb94316afb926f2d9b4da67",
+    "label": "2_script_editor_mobile_dark",
+    "title": "2. Script Editor Workspace (Mobile Dark Mode)",
+    "image": "design/stitch_screens/2_script_editor_mobile_dark.png",
+    "html": "design/stitch_screens/2_script_editor_mobile_dark.html",
+    "image_size_kb": 657.4,
+    "html_size_kb": 26.4
+  },
+  {
+    "id": "082137c8f05e4bb0817ca6fb50f9ffb7",
+    "label": "3_voice_casting_modal_light",
+    "title": "3. Voice Casting Room \u2014 Shared Preset Library Modal (Light Mode)",
+    "image": "design/stitch_screens/3_voice_casting_modal_light.png",
+    "html": "design/stitch_screens/3_voice_casting_modal_light.html",
+    "image_size_kb": 1396.4,
+    "html_size_kb": 47.0
+  },
+  {
+    "id": "2bab0ed9bd3d462d8bcdd1363695faf2",
+    "label": "3_voice_casting_presets_light",
+    "title": "3. Voice Casting Room \u2014 Quick Preset Selector Cards (Light Mode)",
+    "image": "design/stitch_screens/3_voice_casting_presets_light.png",
+    "html": "design/stitch_screens/3_voice_casting_presets_light.html",
+    "image_size_kb": 1003.3,
+    "html_size_kb": 42.0
+  }
+]

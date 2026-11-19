@@ -8,7 +8,10 @@ import {
   Plus, 
   FolderOpen, 
   Layers, 
-  CheckCircle2 
+  CheckCircle2,
+  Radio,
+  Sliders,
+  ChevronDown
 } from 'lucide-react';
 import { ScriptDocument, ProjectMetadata } from './types/script';
 import { UploadView } from './components/UploadView';
@@ -29,7 +32,6 @@ export const App: React.FC = () => {
       if (res.ok) {
         const data = await res.json();
         setProjects(data);
-        // If projects exist and no current script is loaded, load the most recent project
         if (data.length > 0 && !currentScript) {
           loadProject(data[0].id);
         }
@@ -69,31 +71,36 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-100">
-      {/* Top Header / Nav */}
-      <header className="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md px-6 flex items-center justify-between z-20">
-        <div className="flex items-center gap-6">
+    <div className="flex flex-col h-full bg-surface text-on-surface antialiased font-sans">
+      {/* Top Header / Stitch Studio Pro Bar */}
+      <header className="h-16 border-b border-outline-variant/40 bg-surface-container-lowest/90 backdrop-blur-xl px-6 flex items-center justify-between z-20 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center gap-5">
+          {/* Brand Logo */}
           <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setActiveTab('upload')}>
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-950/40">
-              <Sparkles className="w-4 h-4 text-slate-950 fill-slate-950" />
+            <div className="w-8 h-8 rounded-lg bg-surface-container-high border border-primary/30 flex items-center justify-center shadow-[0_0_12px_rgba(78,222,163,0.25)]">
+              <Sparkles className="w-4 h-4 text-primary fill-primary" />
             </div>
-            <div>
-              <span className="text-base font-bold tracking-tight text-white">CastVoice</span>
-              <span className="text-[10px] ml-1.5 px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">MVP</span>
+            <div className="flex items-center gap-2">
+              <span className="text-base font-bold tracking-tight text-on-surface font-sans">CastVoice</span>
+              <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-surface-container-high text-primary border border-primary/20 shadow-[0_0_8px_rgba(78,222,163,0.15)] font-semibold">
+                Studio Pro
+              </span>
             </div>
           </div>
 
+          <div className="h-5 w-px bg-outline-variant/40 hidden sm:block" />
+
           {/* Project Switcher */}
           {projects.length > 0 && (
-            <div className="flex items-center gap-2 pl-4 border-l border-slate-800">
-              <FolderOpen className="w-4 h-4 text-slate-500" />
+            <div className="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+              <span className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_6px_rgba(76,215,246,0.6)]" />
               <select
                 value={currentScript?.project_id || ''}
                 onChange={(e) => loadProject(e.target.value)}
-                className="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-lg px-2.5 py-1 focus:outline-none focus:border-emerald-500 max-w-[200px] truncate"
+                className="bg-transparent text-on-surface text-xs font-semibold focus:outline-none max-w-[200px] truncate cursor-pointer"
               >
                 {projects.map((p) => (
-                  <option key={p.id} value={p.id}>
+                  <option key={p.id} value={p.id} className="bg-surface-container-lowest text-on-surface">
                     {p.title}
                   </option>
                 ))}
@@ -102,56 +109,82 @@ export const App: React.FC = () => {
           )}
         </div>
 
-        {/* Workflow Steps Tabs */}
+        {/* Workflow Stepper Tabs (Stitch Linear Navigation) */}
         {currentScript && (
-          <div className="hidden md:flex items-center bg-slate-950 border border-slate-800 rounded-xl p-1 text-xs">
+          <nav className="hidden xl:flex items-center gap-1 bg-surface-container-low p-1 rounded-full border border-outline-variant/30 shadow-inner">
             <button
               onClick={() => setActiveTab('upload')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
-                activeTab === 'upload' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400 hover:text-slate-200'
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs transition-all ${
+                activeTab === 'upload' 
+                  ? 'bg-surface-container text-on-surface font-semibold shadow-[0_0_12px_rgba(78,222,163,0.2)] text-primary border border-primary/20' 
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              1. Story / URL Text
+              <span className="w-4 h-4 rounded-full bg-surface-container-high text-[10px] flex items-center justify-center font-mono">1</span>
+              Ingest Prose
             </button>
 
             <button
               onClick={() => setActiveTab('editor')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
-                activeTab === 'editor' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400 hover:text-slate-200'
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs transition-all ${
+                activeTab === 'editor' 
+                  ? 'bg-surface-container text-on-surface font-semibold shadow-[0_0_12px_rgba(78,222,163,0.2)] text-primary border border-primary/20' 
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
               }`}
             >
-              <FileEdit className="w-3.5 h-3.5" />
-              2. Review Script & Cast Voices ({currentScript.characters.length})
+              <span className="w-4 h-4 rounded-full bg-surface-container-high text-[10px] flex items-center justify-center font-mono">2</span>
+              Script Editor ({currentScript.lines.length})
+            </button>
+
+            <button
+              onClick={() => setActiveTab('casting')}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs transition-all ${
+                activeTab === 'casting' 
+                  ? 'bg-surface-container text-on-surface font-semibold shadow-[0_0_12px_rgba(78,222,163,0.2)] text-primary border border-primary/20' 
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+              }`}
+            >
+              <span className="w-4 h-4 rounded-full bg-surface-container-high text-[10px] flex items-center justify-center font-mono">3</span>
+              Cast Voices ({currentScript.characters.length})
             </button>
 
             <button
               onClick={() => setActiveTab('player')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
-                activeTab === 'player' ? 'bg-emerald-600 text-white font-semibold' : 'text-slate-400 hover:text-slate-200'
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs transition-all ${
+                activeTab === 'player' 
+                  ? 'bg-primary-container text-white font-semibold shadow-[0_0_16px_rgba(78,222,163,0.3)]' 
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
               }`}
             >
-              <PlayCircle className="w-3.5 h-3.5" />
-              3. Render & Play
+              <span className="w-4 h-4 rounded-full bg-surface-container-high text-[10px] flex items-center justify-center font-mono">4</span>
+              Master Audio
             </button>
-          </div>
+          </nav>
         )}
 
-        {/* New Story Action */}
-        <button
-          onClick={() => {
-            setCurrentScript(null);
-            setActiveTab('upload');
-          }}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
-        >
-          <Plus className="w-3.5 h-3.5 text-emerald-400" />
-          New Story
-        </button>
+        {/* Right Status Cluster & Action Button */}
+        <div className="flex items-center gap-4">
+          {/* DSP Engine Badge */}
+          <div className="hidden lg:flex items-center gap-2 bg-surface-container-low px-2.5 py-1 rounded-full border border-outline-variant/30 font-mono text-[11px] text-on-surface-variant">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(78,222,163,0.8)]" />
+            <span>DSP 48kHz 24-bit</span>
+          </div>
+
+          <button
+            onClick={() => {
+              setCurrentScript(null);
+              setActiveTab('upload');
+            }}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-surface-container text-primary border border-primary/40 hover:bg-primary-container hover:text-white transition-all shadow-[0_0_16px_rgba(78,222,163,0.18)] text-xs font-semibold"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>New Story</span>
+          </button>
+        </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative min-h-0">
+      {/* Main Content View Container */}
+      <main className="flex-1 overflow-hidden relative">
         {activeTab === 'upload' && (
           <UploadView
             onProjectCreated={handleProjectCreated}
@@ -161,6 +194,13 @@ export const App: React.FC = () => {
 
         {activeTab === 'editor' && currentScript && (
           <ScriptEditor
+            script={currentScript}
+            onScriptUpdated={(updated) => setCurrentScript(updated)}
+          />
+        )}
+
+        {activeTab === 'casting' && currentScript && (
+          <VoiceCasting
             script={currentScript}
             onScriptUpdated={(updated) => setCurrentScript(updated)}
             onProceedToRender={() => setActiveTab('player')}
@@ -174,4 +214,5 @@ export const App: React.FC = () => {
     </div>
   );
 };
+
 export default App;

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<title>CastVoice Studio — Voice Casting Room</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    details > summary { list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#f8fafc",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f1f5f9",
+            "surface-container": "#e2e8f0",
+            "surface-container-high": "#cbd5e1",
+            "on-surface": "#0f172a",
+            "on-surface-variant": "#475569",
+            "outline": "#94a3b8",
+            "outline-variant": "#e2e8f0",
+            "primary": "#059669",
+            "primary-container": "#047857",
+            "primary-light": "#ecfdf5",
+            "on-primary": "#ffffff",
+            "secondary": "#0284c7",
+            "secondary-light": "#f0f9ff",
+            "border-clean": "#e2e8f0"
+          },
+          fontFamily: {
+            "sans": ["Plus Jakarta Sans", "sans-serif"],
+            "serif": ["Newsreader", "serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col">
+<!-- Crisp Top Header -->
+<header class="fixed top-0 left-0 right-0 z-50 h-16 bg-surface-container-lowest border-b border-outline-variant shadow-sm px-6 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<!-- Logo -->
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white shadow-sm font-serif font-bold text-lg">
+          CV
+        </div>
+<span class="font-bold text-lg tracking-tight text-on-surface">CastVoice</span>
+<span class="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-primary border border-emerald-200">Studio Pro</span>
+</div>
+<div class="h-5 w-px bg-outline-variant"></div>
+<!-- Chapter Dropdown -->
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors text-left">
+<span class="font-semibold text-sm text-on-surface">A Scandal in Bohemia, Ch. 1</span>
+<span class="text-xs text-on-surface-variant font-mono">• 3,420 words</span>
+<span class="material-symbols-outlined text-outline text-[18px]">expand_more</span>
+</button>
+</div>
+<!-- Stepper Navigation -->
+<nav class="hidden lg:flex items-center gap-1 bg-surface-container-low p-1 rounded-lg border border-outline-variant text-sm font-medium">
+<a class="px-3.5 py-1.5 rounded-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">1. Ingest Prose</a>
+<a class="px-3.5 py-1.5 rounded-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">2. Script Editor</a>
+<a aria-current="page" class="px-3.5 py-1.5 rounded-md bg-white text-primary font-semibold shadow-sm border border-outline-variant/60 flex items-center gap-1.5" href="#">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+        3. Cast Voices
+      </a>
+<a class="px-3.5 py-1.5 rounded-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">4. Render &amp; Play</a>
+</nav>
+<!-- Header Actions -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/80">
+<span class="material-symbols-outlined text-[16px] text-emerald-600">cloud_done</span>
+<span>All Saved</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low font-semibold text-xs transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>New Story</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-slate-200 border border-outline-variant overflow-hidden">
+<img alt="User avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjKslH7XgccrMh_S6MPti7dFAI9Hg2pNeaqR3cW2Jivim2w-1W46ZjYkSiU1ZKrgAO2WQye7yMW_RBjpVUnr0JMAYolbHqGxPVeomzSFDY88a5FiizcebneYX6rTy55BSxgtM7ABD_x_XZlCDucWhD9uIQmjcVPIsf41FBXMI4q7ruxZJuY4fo2GaR7LvkyxgXdabaUsaFSvQcGuolOTC5pTxzs66VsOYjKIHKVGQ"/>
+</div>
+</div>
+</header>
+<!-- Left Sidebar -->
+<aside class="fixed left-0 top-16 bottom-0 w-60 bg-surface-container-lowest border-r border-outline-variant z-40 flex flex-col justify-between p-4">
+<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-1">
+<span class="text-[11px] font-bold text-outline uppercase tracking-wider px-2 py-1">Workspace</span>
+<nav class="flex flex-col gap-1 text-sm font-medium">
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px] text-outline">edit_note</span>
+<span>Script View</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-800 font-semibold border border-emerald-100" href="#">
+<span class="material-symbols-outlined text-[20px] text-primary">group</span>
+<span>Cast Roster</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px] text-outline">graphic_eq</span>
+<span>SFX &amp; Cues</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px] text-outline">tune</span>
+<span>DAW Mixer</span>
+</a>
+</nav>
+</div>
+<!-- Audiobook Spec Badge -->
+<div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant flex flex-col gap-1.5">
+<span class="text-[10px] uppercase font-bold tracking-wider text-outline">Audio Pipeline</span>
+<div class="flex items-center justify-between text-xs">
+<span class="font-medium text-on-surface">Neural Engine</span>
+<span class="font-mono text-primary font-semibold text-[11px]">48kHz 24-bit</span>
+</div>
+<div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full w-full"></div>
+</div>
+</div>
+</div>
+<!-- Quick Help & Documentation link -->
+<div class="pt-4 border-t border-outline-variant flex items-center justify-between text-xs text-on-surface-variant">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        Voice Models Active
+      </span>
+<span class="font-mono text-[11px] text-outline">v2.4</span>
+</div>
+</aside>
+<!-- Main Content Space -->
+<div class="pl-60 pt-16 flex-1 flex flex-col pb-28">
+<main class="w-full max-w-7xl mx-auto px-8 py-6 space-y-6 flex-1">
+<!-- Clean Header & Status Overview -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<div class="space-y-1">
+<div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+<span>Step 3 of 4</span>
+<span class="text-outline">•</span>
+<span class="text-on-surface-variant">Audiobook Ensemble</span>
+</div>
+<h1 class="font-serif text-3xl font-medium text-on-surface tracking-tight">Voice Casting Room</h1>
+<p class="text-sm text-on-surface-variant">Assign and audition character voices for <span class="font-semibold text-on-surface">“A Scandal in Bohemia”</span></p>
+</div>
+<!-- Clean Metric Status Pill -->
+<div class="flex items-center gap-4 bg-surface-container-low px-4 py-2.5 rounded-lg border border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">check_circle</span>
+<div>
+<div class="text-xs font-bold text-on-surface">4 / 4 Voices Assigned</div>
+<div class="text-[11px] text-on-surface-variant">Ensemble fully locked</div>
+</div>
+</div>
+<div class="h-6 w-px bg-outline-variant"></div>
+<div>
+<div class="text-[11px] uppercase tracking-wider text-outline font-medium">Estimated Runtime</div>
+<div class="font-mono font-semibold text-xs text-on-surface">~03:42 master</div>
+</div>
+</div>
+</div>
+<!-- Filter Controls & Action Bar -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<!-- Filter Tabs -->
+<div class="flex items-center gap-1.5 p-1 bg-surface-container-low rounded-lg border border-outline-variant w-fit">
+<button class="px-3.5 py-1.5 rounded-md bg-surface-container-lowest text-on-surface font-semibold text-xs shadow-sm border border-outline-variant/60">
+            All Roles (4)
+          </button>
+<button class="px-3.5 py-1.5 rounded-md text-on-surface-variant hover:text-on-surface text-xs font-medium transition-colors">
+            Unassigned (0)
+          </button>
+<button class="px-3.5 py-1.5 rounded-md text-on-surface-variant hover:text-on-surface text-xs font-medium transition-colors hidden sm:block">
+            British Accents
+          </button>
+</div>
+<!-- Secondary Action and Primary Advance CTA -->
+<div class="flex items-center gap-2.5">
+<button class="px-3 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm" onclick="document.getElementById('voice-preset-library-modal').classList.remove('hidden')"><span class="material-symbols-outlined text-[16px] text-primary">bookmarks</span><span>Project Voice Library (4)</span></button><button class="px-3 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low text-xs font-semibold flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_fix_high</span>
+<span>Auto-Cast Recommended</span>
+</button>
+<a class="px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all" href="#">
+<span>Proceed to Render</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- 2-Column Character Casting Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+<!-- CARD 1: Dr. John Watson -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+<!-- Top Row: Identity & Lines -->
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="relative w-12 h-12 rounded-lg overflow-hidden border border-outline-variant shrink-0 bg-slate-100">
+<img alt="Portrait of Dr. John Watson" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3gbd81LxtPr8Lg0qkXPmeOmRYOQxgrJ7_7gs43miZXe6yJnzL1V9okkQISIY1wlo4CvB1lbQIguIlC2UNW0YxuaMrcOb82F_EsX1iP5wmVk9NUP7E_2Kx9lA5CllBMHLW-Imb050NgXak401aKPG-2iLKt_Zf4TfyEXputZfGst7vAGckZp-IQE7AORJCfunJepQLD07plQGFDx8U-WepBukY3I_ROkPOBvdZPzw"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-serif font-semibold text-lg text-on-surface">Dr. John Watson</h3>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">Narrator</span>
+</div>
+<div class="text-xs text-on-surface-variant mt-0.5">
+                  Primary Narrator &amp; Observer <span class="text-outline">•</span> <span class="font-medium text-emerald-700">14 lines (58%)</span>
+</div>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200/80">
+<span class="material-symbols-outlined text-[14px]">check</span> Locked
+            </span>
+</div>
+<!-- Selected Voice & Audition Strip -->
+<div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-container transition-colors shadow-sm shrink-0" title="Audition Guy">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-on-surface">Guy (UK Baritone)</span>
+<span class="text-[10px] font-mono text-outline">Warm &amp; Introspective</span>
+</div>
+<p class="text-[11px] text-on-surface-variant truncate">Classic Victorian literary cadence, high clarity</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="text-[10px] font-mono font-medium text-emerald-700 bg-emerald-100/60 px-1.5 py-0.5 rounded">Active</span>
+</div>
+</div>
+<!-- Clean Voice Selector Chips -->
+<div class="flex items-center gap-2">
+<span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Alternate:</span>
+<button class="px-2.5 py-1 rounded border border-outline-variant hover:border-slate-400 bg-white text-[11px] font-medium text-on-surface-variant transition-colors flex items-center gap-1">
+<span>Arthur (Classical BBC)</span>
+</button>
+<button class="px-2.5 py-1 rounded border border-outline-variant hover:border-slate-400 bg-white text-[11px] font-medium text-on-surface-variant transition-colors flex items-center gap-1">
+<span>Miles (Transatlantic)</span>
+</button>
+</div>
+<!-- Micro-tuning Accordion -->
+<details class="group border-t border-outline-variant/60 pt-3">
+<summary class="flex items-center justify-between cursor-pointer text-xs font-semibold text-on-surface-variant hover:text-on-surface">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">tune</span>
+                Micro-Tuning (Pitch, Cadence, Emotion)
+              </span>
+<span class="material-symbols-outlined text-[16px] text-outline group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="grid grid-cols-3 gap-3 pt-3">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium">
+<span>Pitch</span>
+<span class="font-mono text-primary">-2 st</span>
+</div>
+<input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="6" min="-6" type="range" value="-2"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium">
+<span>Cadence</span>
+<span class="font-mono text-primary">0.96x</span>
+</div>
+<input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="1.3" min="0.7" step="0.02" type="range" value="0.96"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium">
+<span>Breathiness</span>
+<span class="font-mono text-primary">+18%</span>
+</div>
+<input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="50" min="0" type="range" value="18"/>
+</div>
+</div>
+</details>
+</div>
+<!-- CARD 2: Sherlock Holmes -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+<!-- Top Row: Identity & Lines -->
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="relative w-12 h-12 rounded-lg overflow-hidden border border-outline-variant shrink-0 bg-slate-100">
+<img alt="Portrait of Sherlock Holmes" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqHD-LVk0jXAWMjfd91MY0Gek54lZ-28KN_LOCJQ08TagnDWUsh9bwNYZ2dAp46Hgdgu8faI4TOlJu7zLBNC5AjA7u_qTKP4i6ZcZS0PpLzIdQpazHdVR1kCRzbJB2BsG0vBxNsi3rehzJTk-w0g5zxpL-raCcyEqz8yR5I-prNQzm-UmvxHx4Nv_kZ5D685jze8YkRzx8neiibdjY5maTUhWpFrz8EIG6qEST0Sk"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-serif font-semibold text-lg text-on-surface">Sherlock Holmes</h3>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">Protagonist</span>
+</div>
+<div class="text-xs text-on-surface-variant mt-0.5">
+                  Consulting Detective <span class="text-outline">•</span> <span class="font-medium text-emerald-700">7 lines (29%)</span>
+</div>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200/80">
+<span class="material-symbols-outlined text-[14px]">check</span> Locked
+            </span>
+</div>
+<!-- Selected Voice & Audition Strip -->
+<div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-container transition-colors shadow-sm shrink-0" title="Audition Alistair">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-on-surface">Alistair (UK Aristocratic)</span>
+<span class="text-[10px] font-mono text-outline">Crisp Tenor</span>
+</div>
+<p class="text-[11px] text-on-surface-variant truncate">Fast deductions, razor articulation, cold intellectualism</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="text-[10px] font-mono font-medium text-emerald-700 bg-emerald-100/60 px-1.5 py-0.5 rounded">Active</span>
+</div>
+</div>
+<!-- Clean Voice Selector Chips -->
+<div class="flex items-center gap-2">
+<span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Alternate:</span>
+<button class="px-2.5 py-1 rounded border border-outline-variant hover:border-slate-400 bg-white text-[11px] font-medium text-on-surface-variant transition-colors flex items-center gap-1">
+<span>Rowan (Dark UK Suspense)</span>
+</button>
+</div>
+<!-- Micro-tuning Accordion -->
+<details class="group border-t border-outline-variant/60 pt-3" open=""><summary class="flex items-center justify-between cursor-pointer text-xs font-semibold text-primary hover:text-primary-container"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">tune</span>Micro-Tuning (Pitch, Cadence, Emotion)</span><span class="material-symbols-outlined text-[16px] text-primary transition-transform rotate-180">expand_more</span></summary><div class="pt-4 space-y-4"><div class="flex flex-col gap-1.5 p-3 rounded-lg bg-surface-container-low border border-outline-variant"><div class="flex items-center justify-between"><span class="text-[11px] font-bold text-outline uppercase tracking-wider">Directorial Emotion &amp; Delivery</span><span class="text-[10px] text-emerald-700 bg-emerald-100/60 px-1.5 py-0.5 rounded font-mono font-medium">Active Style</span></div><div class="flex flex-wrap items-center gap-1.5 pt-1"><button class="px-2.5 py-1 rounded-full bg-primary text-white text-[11px] font-semibold flex items-center gap-1 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-white"></span>Analytical / Aloof</button><button class="px-2.5 py-1 rounded-full bg-white border border-outline-variant text-[11px] font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors">Urgent / Tense</button><button class="px-2.5 py-1 rounded-full bg-white border border-outline-variant text-[11px] font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors">Cold Deductive</button><button class="px-2.5 py-1 rounded-full bg-white border border-outline-variant text-[11px] font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors">Wry / Amused</button><button class="px-2 py-1 rounded-full border border-dashed border-outline-variant text-[11px] font-medium text-primary hover:bg-emerald-50 transition-colors flex items-center gap-0.5"><span class="material-symbols-outlined text-[14px]">add</span>Custom Tag</button></div></div><div class="grid grid-cols-2 gap-3"><div class="p-3 rounded-lg bg-white border border-outline-variant space-y-2"><div class="flex items-center justify-between"><span class="text-[11px] font-semibold text-on-surface">Pitch Shift</span><div class="flex items-center gap-1.5"><span class="font-mono font-bold text-xs text-primary bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded">-1.5 st</span><button class="text-outline hover:text-on-surface" title="Reset pitch"><span class="material-symbols-outlined text-[14px]">restart_alt</span></button></div></div><input class="w-full accent-primary h-1.5 bg-slate-200 rounded cursor-pointer" max="12" min="-12" step="0.5" type="range" value="-1.5"/><div class="flex justify-between text-[10px] text-outline font-mono"><span>-12 st</span><span class="text-on-surface-variant font-medium">0 (Natural)</span><span>+12 st</span></div></div><div class="p-3 rounded-lg bg-white border border-outline-variant space-y-2"><div class="flex items-center justify-between"><span class="text-[11px] font-semibold text-on-surface">Pacing / Cadence</span><div class="flex items-center gap-1.5"><span class="font-mono font-bold text-xs text-primary bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded">1.05x</span><span class="text-[10px] font-mono text-outline">~148 wpm</span></div></div><input class="w-full accent-primary h-1.5 bg-slate-200 rounded cursor-pointer" max="1.4" min="0.7" step="0.01" type="range" value="1.05"/><div class="flex justify-between text-[10px] text-outline font-mono"><span>0.70x</span><span>1.0x</span><span>1.40x</span></div></div><div class="p-3 rounded-lg bg-white border border-outline-variant space-y-2"><div class="flex items-center justify-between"><span class="text-[11px] font-semibold text-on-surface">Breathiness &amp; Intimacy</span><span class="font-mono font-bold text-xs text-primary bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded">22%</span></div><input class="w-full accent-primary h-1.5 bg-slate-200 rounded cursor-pointer" max="60" min="0" type="range" value="22"/><div class="flex justify-between text-[10px] text-outline font-mono"><span>Crisp Dry</span><span class="text-on-surface-variant">Warm Room</span><span>Intimate</span></div></div><div class="p-3 rounded-lg bg-white border border-outline-variant space-y-2"><div class="flex items-center justify-between"><span class="text-[11px] font-semibold text-on-surface">Stability &amp; Predictability</span><span class="font-mono font-bold text-xs text-primary bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded">78%</span></div><input class="w-full accent-primary h-1.5 bg-slate-200 rounded cursor-pointer" max="100" min="20" type="range" value="78"/><div class="flex justify-between text-[10px] text-outline font-mono"><span>Dynamic</span><span>Consistent Cadence</span></div></div></div><div class="p-2.5 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-between gap-3"><div class="flex items-center gap-1.5 shrink-0"><span class="material-symbols-outlined text-[16px] text-outline">graphic_eq</span><span class="text-[11px] font-semibold text-on-surface">Vocal Tract Formant:</span></div><div class="flex items-center gap-2 flex-1 max-w-xs"><span class="text-[10px] text-outline font-medium shrink-0">Crisper / Light</span><input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="100" min="0" type="range" value="68"/><span class="text-[10px] text-on-surface font-semibold shrink-0">Resonant / Deep (+68)</span></div></div><div class="p-3 rounded-lg bg-emerald-50/60 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div class="flex items-center gap-2.5 min-w-0"><button class="px-3 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm" onclick="document.getElementById('voice-preset-library-modal').classList.remove('hidden')"><span class="material-symbols-outlined text-[16px] text-primary">bookmarks</span><span>Project Voice Library (4)</span></button><button class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-container transition-colors shadow-sm shrink-0" title="Audition Tuned Sample"><span class="material-symbols-outlined text-[16px]">play_arrow</span></button><div class="min-w-0"><div class="text-[11px] font-semibold text-on-surface truncate">Test Sample: <span class="font-serif italic font-normal text-on-surface-variant">“A visitor at this hour, Watson... and on such a night?”</span></div><div class="text-[10px] font-mono text-emerald-700 flex items-center gap-2"><span>Tuned Profile Loaded</span><span>•</span><span>0.8s pre-rendered</span></div></div></div><div class="flex items-center gap-2 shrink-0"><button class="px-2 py-1 rounded bg-white border border-outline-variant hover:border-slate-400 text-[10px] font-semibold text-on-surface-variant flex items-center gap-1 transition-colors"><span class="material-symbols-outlined text-[13px]">compare_arrows</span>Compare Original</button><button class="px-2.5 py-1 rounded bg-primary hover:bg-primary-container text-white text-[10px] font-bold flex items-center gap-1 shadow-sm transition-colors" onclick="document.getElementById('voice-preset-library-modal').classList.remove('hidden')"><span class="material-symbols-outlined text-[13px]">save</span>Save Preset</button></div></div></div></details>
+</div>
+<!-- CARD 3: Count Von Kramm -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+<!-- Top Row: Identity & Lines -->
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="relative w-12 h-12 rounded-lg overflow-hidden border border-outline-variant shrink-0 bg-slate-100">
+<img alt="Portrait of Count Von Kramm" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3nTede8ybbcA5IwnqaX1iwXXRdvTdldvdb9QkmTRnARGQaqFCN3Tyiihzm_FAZn_rwVJGA8QldpmjKDcVjtdgeIQUeZZ-r3WS94eTRertorHjV_V35x0LVcGkbsPJvXdAmQzpWTxgG-aDQVWOZoJzuzhtQSIOqvvDcJiXbrL4EkozRp_BBkolApBfbdjpH1Evtn7z3ZuKXZxqFY6Z3_m7itxh8bencAY4pNqn19A"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-serif font-semibold text-lg text-on-surface">Count Von Kramm</h3>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Client / King</span>
+</div>
+<div class="text-xs text-on-surface-variant mt-0.5">
+                  The Bohemian Monarch <span class="text-outline">•</span> <span class="font-medium text-emerald-700">3 lines (13%)</span>
+</div>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200/80">
+<span class="material-symbols-outlined text-[14px]">check</span> Locked
+            </span>
+</div>
+<!-- Selected Voice & Audition Strip -->
+<div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-container transition-colors shadow-sm shrink-0" title="Audition Klaus">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-on-surface">Klaus (Austrian Accent)</span>
+<span class="text-[10px] font-mono text-outline">Gravity Baritone</span>
+</div>
+<p class="text-[11px] text-on-surface-variant truncate">Regal timbre, subtle anxiety, aristocratic German cadence</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="text-[10px] font-mono font-medium text-emerald-700 bg-emerald-100/60 px-1.5 py-0.5 rounded">Active</span>
+</div>
+</div>
+<!-- Clean Voice Selector Chips -->
+<div class="flex items-center gap-2">
+<span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Alternate:</span>
+<button class="px-2.5 py-1 rounded border border-outline-variant hover:border-slate-400 bg-white text-[11px] font-medium text-on-surface-variant transition-colors flex items-center gap-1">
+<span>Viktor (Slavic Baritone)</span>
+</button>
+</div>
+<!-- Micro-tuning Accordion -->
+<details class="group border-t border-outline-variant/60 pt-3">
+<summary class="flex items-center justify-between cursor-pointer text-xs font-semibold text-on-surface-variant hover:text-on-surface">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">tune</span>
+                Micro-Tuning (Pitch, Cadence, Emotion)
+              </span>
+<span class="material-symbols-outlined text-[16px] text-outline group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="grid grid-cols-3 gap-3 pt-3">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium">
+<span>Pitch</span>
+<span class="font-mono text-primary">-3 st</span>
+</div>
+<input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="6" min="-6" type="range" value="-3"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium">
+<span>Cadence</span>
+<span class="font-mono text-primary">0.92x</span>
+</div>
+<input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="1.3" min="0.7" step="0.02" type="range" value="0.92"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium">
+<span>Weight</span>
+<span class="font-mono text-primary">+24%</span>
+</div>
+<input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="50" min="0" type="range" value="24"/>
+</div>
+</div>
+</details>
+</div>
+<!-- CARD 4: Irene Adler -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+<!-- Top Row: Identity & Lines -->
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="relative w-12 h-12 rounded-lg overflow-hidden border border-outline-variant shrink-0 bg-slate-100">
+<img alt="Portrait of Irene Adler" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuKEz8eTOIVCu38S0tCozx1J3sAKXKIOo6g6G15v8G5Ug-fxZ6LfwSb4vdfznr_0oBxNz3sobmMvDgjgffGsOWh6o0ykMq2b6orTN08it_EtEisNHPjfcdMs3o9T4jhbhgMBPrajqhP5_DfTRXiRN8HRx4Akuyiq3W_qbnDnn68Dh5L7D41B2hYCsRfDuKAPDrEh_MEboYIdUrGoP5_sO9oKfFvcYrAl2cnOq39bg"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-serif font-semibold text-lg text-on-surface">Irene Adler</h3>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">The Woman</span>
+</div>
+<div class="text-xs text-on-surface-variant mt-0.5">
+                  Contralto Prima Donna <span class="text-outline">•</span> <span class="font-medium text-secondary">Anticipated Ch. 2</span>
+</div>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200/80">
+<span class="material-symbols-outlined text-[14px]">check</span> Locked
+            </span>
+</div>
+<!-- Selected Voice & Audition Strip -->
+<div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-container transition-colors shadow-sm shrink-0" title="Audition Sonia">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-on-surface">Sonia (UK Dramatic)</span>
+<span class="text-[10px] font-mono text-outline">Velvet Contralto</span>
+</div>
+<p class="text-[11px] text-on-surface-variant truncate">Sultry poise, sharp wit, operatic control and depth</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="text-[10px] font-mono font-medium text-emerald-700 bg-emerald-100/60 px-1.5 py-0.5 rounded">Active</span>
+</div>
+</div>
+<!-- Clean Voice Selector Chips -->
+<div class="flex items-center gap-2">
+<span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Alternate:</span>
+<button class="px-2.5 py-1 rounded border border-outline-variant hover:border-slate-400 bg-white text-[11px] font-medium text-on-surface-variant transition-colors flex items-center gap-1">
+<span>Helena (French/English)</span>
+</button>
+</div>
+<!-- Micro-tuning Accordion -->
+<details class="group border-t border-outline-variant/60 pt-3">
+<summary class="flex items-center justify-between cursor-pointer text-xs font-semibold text-on-surface-variant hover:text-on-surface">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">tune</span>
+                Micro-Tuning (Pitch, Cadence, Emotion)
+              </span>
+<span class="material-symbols-outlined text-[16px] text-outline group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="grid grid-cols-3 gap-3 pt-3">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium">
+<span>Pitch</span>
+<span class="font-mono text-primary">-0.4 st</span>
+</div>
+<input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="6" min="-6" type="range" value="0"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium">
+<span>Cadence</span>
+<span class="font-mono text-primary">1.02x</span>
+</div>
+<input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="1.3" min="0.7" step="0.02" type="range" value="1.02"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium">
+<span>Resonance</span>
+<span class="font-mono text-primary">+12%</span>
+</div>
+<input class="w-full accent-primary h-1 bg-slate-200 rounded cursor-pointer" max="50" min="0" type="range" value="12"/>
+</div>
+</div>
+</details>
+</div>
+</div>
+</main>
+<!-- Clean Focused Bottom Action Dock -->
+<footer class="fixed bottom-0 left-60 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-md border-t border-outline-variant px-8 py-3.5 shadow-lg flex items-center justify-between gap-6">
+<!-- Master Audio Preview Left -->
+<div class="flex items-center gap-3 shrink-0">
+<button class="w-10 h-10 rounded-full bg-primary hover:bg-primary-container text-white flex items-center justify-center shadow-sm transition-transform active:scale-95" id="masterPlayBtn" title="Play Ensemble Sample">
+<span class="material-symbols-outlined text-[24px]">play_arrow</span>
+</button>
+<div>
+<div class="text-xs font-bold text-on-surface flex items-center gap-1.5">
+<span>Ensemble Preview</span>
+<span class="text-[10px] font-mono font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 rounded">Ready</span>
+</div>
+<div class="text-[11px] text-on-surface-variant">Watson (Guy) &amp; Holmes (Alistair) • Dialogue Audition</div>
+</div>
+</div>
+<!-- Waveform Progress Scrubbed -->
+<div class="hidden md:flex items-center gap-3 flex-1 max-w-xl mx-4">
+<span class="text-xs font-mono font-medium text-primary shrink-0">01:14</span>
+<div class="relative w-full h-7 bg-surface-container-low rounded border border-outline-variant overflow-hidden cursor-pointer flex items-center px-1">
+<svg class="w-full h-5" preserveaspectratio="none" viewbox="0 0 300 20">
+<path d="M0,10 L5,6 L10,14 L15,3 L20,17 L25,5 L30,15 L35,9 L40,11 L45,2 L50,18 L55,7 L60,13 L65,7 L70,14 L75,2 L80,19 L85,8 L90,12 L95,5 L100,16 L105,10 L110,10 L115,4 L120,16 L125,6 L130,14 L135,9 L140,11 L145,2 L150,18 L155,7 L160,13 L165,7 L170,14 L175,3 L180,17 L185,8 L190,12 L195,5 L200,15 L205,9 L210,11 L215,6 L220,14 L225,4 L230,16 L235,7 L240,13 L245,7 L250,14 L255,2 L260,18 L265,8 L270,12 L275,5 L280,15 L285,9 L290,11 L295,7 L300,10" fill="none" stroke="#cbd5e1" stroke-width="2"></path>
+<path d="M0,10 L5,6 L10,14 L15,3 L20,17 L25,5 L30,15 L35,9 L40,11 L45,2 L50,18 L55,7 L60,13 L65,7 L70,14 L75,2 L80,19 L85,8 L90,12 L95,5 L100,16 L105,10 L110,10 L115,4 L120,16 L125,6 L130,14" fill="none" stroke="#059669" stroke-width="2"></path>
+</svg>
+<div class="absolute left-[43%] top-0 bottom-0 w-0.5 bg-primary">
+<div class="w-1.5 h-1.5 rounded-full bg-primary -ml-[2px] -mt-0.5"></div>
+</div>
+</div>
+<span class="text-xs font-mono font-medium text-on-surface-variant shrink-0">03:42</span>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-3 shrink-0">
+<a class="px-3.5 py-2 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface text-xs font-semibold flex items-center gap-1.5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+<span>Back to Script</span>
+</a>
+<a class="px-5 py-2 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5" href="#">
+<span>Render Full Cast Audio Master (03:42)</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</footer><div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all" id="voice-preset-library-modal"><div class="bg-surface-container-lowest w-full max-w-2xl rounded-xl border border-outline-variant shadow-xl overflow-hidden flex flex-col max-h-[90vh]"><div class="px-6 py-4 border-b border-outline-variant flex items-center justify-between bg-surface"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[20px]">tune</span></div><div><div class="flex items-center gap-2"><h3 class="font-serif font-semibold text-lg text-on-surface">Voice Preset Library</h3><span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-100/60 text-emerald-800 font-semibold">Studio Pro</span></div><p class="text-xs text-on-surface-variant">Save current tuning parameters or load from the shared production library</p></div></div><button class="w-8 h-8 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors" onclick="document.getElementById('voice-preset-library-modal').classList.add('hidden')"><span class="material-symbols-outlined text-[20px]">close</span></button></div><div class="px-6 pt-3 border-b border-outline-variant bg-surface flex items-center gap-4 text-xs font-semibold"><button class="pb-2.5 border-b-2 border-primary text-primary flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">save</span>Save Current Tuning as Preset</button><button class="pb-2.5 text-on-surface-variant hover:text-on-surface flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">auto_stories</span>Shared Project Library (4)</button></div><div class="p-6 overflow-y-auto space-y-4 flex-1"><div class="p-3.5 rounded-lg bg-emerald-50/60 border border-emerald-200 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg overflow-hidden border border-outline-variant shrink-0 bg-slate-100"><img alt="Sherlock Holmes" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqHD-LVk0jXAWMjfd91MY0Gek54lZ-28KN_LOCJQ08TagnDWUsh9bwNYZ2dAp46Hgdgu8faI4TOlJu7zLBNC5AjA7u_qTKP4i6ZcZS0PpLzIdQpazHdVR1kCRzbJB2BsG0vBxNsi3rehzJTk-w0g5zxpL-raCcyEqz8yR5I-prNQzm-UmvxHx4Nv_kZ5D685jze8YkRzx8neiibdjY5maTUhWpFrz8EIG6qEST0Sk"/></div><div><div class="flex items-center gap-2"><span class="text-xs font-bold text-on-surface">Source: Sherlock Holmes</span><span class="text-[10px] font-mono bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200">Protagonist</span></div><p class="text-[11px] text-on-surface-variant">Base Voice: Alistair (UK Aristocratic)</p></div></div><div class="text-right"><span class="text-[11px] font-mono font-semibold text-emerald-800 bg-white border border-emerald-200 px-2 py-1 rounded shadow-sm">Custom Micro-Tuned</span></div></div><div class="space-y-3"><div class="space-y-1.5"><label class="text-xs font-bold text-on-surface flex items-center justify-between">Preset Name <span class="text-[11px] font-normal text-outline">Required</span></label><input class="w-full px-3 py-2 text-xs rounded-lg border border-outline-variant bg-surface focus:outline-none focus:border-primary text-on-surface font-medium" type="text" value="Sherlock Holmes — Cold Deductive v2"/></div><div class="space-y-1.5"><label class="text-xs font-bold text-on-surface">Tags &amp; Character Traits</label><div class="flex flex-wrap items-center gap-1.5"><span class="px-2 py-1 rounded bg-surface-container-low border border-outline-variant text-[11px] font-medium text-on-surface flex items-center gap-1">Protagonist<button class="hover:text-rose-700"><span class="material-symbols-outlined text-[13px]">close</span></button></span><span class="px-2 py-1 rounded bg-surface-container-low border border-outline-variant text-[11px] font-medium text-on-surface flex items-center gap-1">Victorian<button class="hover:text-rose-700"><span class="material-symbols-outlined text-[13px]">close</span></button></span><span class="px-2 py-1 rounded bg-surface-container-low border border-outline-variant text-[11px] font-medium text-on-surface flex items-center gap-1">Rapid Pacing<button class="hover:text-rose-700"><span class="material-symbols-outlined text-[13px]">close</span></button></span><button class="px-2 py-1 rounded border border-dashed border-outline-variant text-[11px] font-medium text-primary hover:bg-emerald-50 flex items-center gap-0.5"><span class="material-symbols-outlined text-[13px]">add</span>Add Tag</button></div></div><div class="space-y-1.5"><label class="text-xs font-bold text-on-surface">Target Scope &amp; Availability</label><div class="grid grid-cols-2 gap-3"><label class="flex items-center gap-2.5 p-2.5 rounded-lg border border-primary bg-emerald-50/50 cursor-pointer"><input checked="" class="accent-primary w-4 h-4" name="preset_scope" type="radio"/><div><div class="text-xs font-semibold text-on-surface">This Project Only</div><div class="text-[10px] text-on-surface-variant">A Scandal in Bohemia</div></div></label><label class="flex items-center gap-2.5 p-2.5 rounded-lg border border-outline-variant bg-surface cursor-pointer hover:bg-surface-container-low"><input class="accent-primary w-4 h-4" name="preset_scope" type="radio"/><div><div class="text-xs font-semibold text-on-surface">Workspace &amp; Shared Series</div><div class="text-[10px] text-on-surface-variant">Usable across all Sherlock Holmes chapters</div></div></label></div></div><div class="p-3 rounded-lg bg-surface border border-outline-variant space-y-2"><div class="flex items-center justify-between text-[11px] font-semibold text-on-surface"><span>Parameters to be Saved</span><span class="font-mono text-[10px] text-outline">4 values snapshot</span></div><div class="grid grid-cols-4 gap-2 text-center"><div class="p-2 rounded bg-surface-container-lowest border border-outline-variant/60"><div class="text-[10px] text-outline font-medium">Pitch</div><div class="font-mono font-bold text-xs text-primary mt-0.5">-1.5 st</div></div><div class="p-2 rounded bg-surface-container-lowest border border-outline-variant/60"><div class="text-[10px] text-outline font-medium">Pacing</div><div class="font-mono font-bold text-xs text-primary mt-0.5">1.05x</div></div><div class="p-2 rounded bg-surface-container-lowest border border-outline-variant/60"><div class="text-[10px] text-outline font-medium">Breathiness</div><div class="font-mono font-bold text-xs text-primary mt-0.5">22%</div></div><div class="p-2 rounded bg-surface-container-lowest border border-outline-variant/60"><div class="text-[10px] text-outline font-medium">Formant</div><div class="font-mono font-bold text-xs text-primary mt-0.5">+68</div></div></div></div><div class="space-y-1.5"><label class="text-xs font-bold text-on-surface">Casting Notes &amp; Delivery Instructions <span class="text-[11px] font-normal text-outline">Optional</span></label><textarea class="w-full px-3 py-2 text-xs rounded-lg border border-outline-variant bg-surface focus:outline-none focus:border-primary text-on-surface resize-none" placeholder="e.g. Sharp British dialect, fast cadenced deductions, low breathiness for analytical coldness." rows="2"></textarea></div></div></div><div class="px-6 py-3.5 bg-surface border-t border-outline-variant flex items-center justify-between"><span class="text-[11px] text-on-surface-variant flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-emerald-600">verified_user</span>Saved presets sync to cloud</span><div class="flex items-center gap-2.5"><button class="px-4 py-2 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface text-xs font-semibold transition-colors" onclick="document.getElementById('voice-preset-library-modal').classList.add('hidden')">Cancel</button><button class="px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all" onclick="document.getElementById('voice-preset-library-modal').classList.add('hidden')"><span class="material-symbols-outlined text-[16px]">save</span>Save to Project Library</button></div></div></div></div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const masterPlayBtn = document.getElementById('masterPlayBtn');
+      let isPlaying = false;
+
+      if (masterPlayBtn) {
+        masterPlayBtn.addEventListener('click', () => {
+          isPlaying = !isPlaying;
+          const icon = masterPlayBtn.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.textContent = isPlaying ? 'pause' : 'play_arrow';
+          }
+        });
+      }
+    });
+  </script>
+</body></html>

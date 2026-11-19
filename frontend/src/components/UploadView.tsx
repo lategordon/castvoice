@@ -211,33 +211,32 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
   };
 
   return (
-    <div className="h-full overflow-y-auto w-full">
-      <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 pb-36">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium mb-2">
+    <div className="h-full overflow-y-auto w-full bg-surface">
+      <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 pb-36">
+        {/* Stitch Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high text-primary border border-primary/20 shadow-[0_0_12px_rgba(78,222,163,0.15)] text-xs font-semibold uppercase tracking-wider mb-3">
             <Sparkles className="w-3.5 h-3.5" />
-            Full-Cast Audio Plays & Webpage Podcast Studio
+            CastVoice Studio Pro • AI Audio Adaptation
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            Transform Web Articles & Prose into Audio
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-on-surface font-sans">
+            Transform Web Articles & Prose into Full-Cast Audio
           </h1>
-          <p className="mt-1 text-slate-400 max-w-xl mx-auto text-xs sm:text-sm">
-            Import any webpage URL or paste longform reading. Turn it into a <strong>2-host conversational podcast</strong>, 
-            a <strong>chaptered audio article</strong>, or a <strong>full-cast audio drama</strong>.
+          <p className="mt-2 text-on-surface-variant max-w-2xl mx-auto text-sm leading-relaxed">
+            Import any article URL or paste longform fiction. CastVoice automatically dissects dialogue, attributes characters, attaches delivery cues, and mixes Foley sound effects.
           </p>
         </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+      <div className="bg-surface-container-low border border-outline-variant/30 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
         {/* Step 1: Input Source Selector Tabs */}
         <div>
-          <div className="flex border-b border-slate-800 gap-2 mb-4">
+          <div className="flex border-b border-outline-variant/30 gap-2 mb-4">
             <button
               onClick={() => setInputTab('url')}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition ${
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition ${
                 inputTab === 'url'
-                  ? 'border-emerald-500 text-emerald-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface'
               }`}
             >
               <Globe className="w-4 h-4" />
@@ -245,14 +244,14 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
             </button>
             <button
               onClick={() => setInputTab('text')}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition ${
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition ${
                 inputTab === 'text'
-                  ? 'border-emerald-500 text-emerald-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface'
               }`}
             >
               <BookOpen className="w-4 h-4" />
-              Paste Text / Upload File
+              Paste Story Prose / Upload File
             </button>
           </div>
 
@@ -266,18 +265,18 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
                     placeholder="https://substack.com/... or https://medium.com/... or any article URL"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary shadow-inner"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => handleFetchUrl()}
                   disabled={isFetchingUrl || !url.trim()}
-                  className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-medium text-sm rounded-xl transition flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-emerald-950/40"
+                  className="px-5 py-3 bg-primary text-on-primary hover:bg-primary-container disabled:opacity-50 font-semibold text-sm rounded-xl transition flex items-center justify-center gap-2 shrink-0 shadow-[0_0_16px_rgba(78,222,163,0.25)]"
                 >
                   {isFetchingUrl ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
                       Fetching Article...
                     </>
                   ) : (
@@ -290,11 +289,11 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
               </div>
 
               {/* Sample link helper */}
-              <div className="flex items-center justify-between text-xs text-slate-500">
+              <div className="flex items-center justify-between text-xs text-on-surface-variant">
                 <span>Supports Substacks, blogs, Medium, news articles, and long essays.</span>
                 <button
                   onClick={loadSampleArticle}
-                  className="text-emerald-400 hover:underline inline-flex items-center gap-1 font-medium"
+                  className="text-primary hover:underline inline-flex items-center gap-1 font-semibold"
                 >
                   Load Sample Longform Article
                 </button>
@@ -373,11 +372,11 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
             </span>
           </div>
           <textarea
-            rows={inputTab === 'url' && text ? 3 : 5}
+            rows={inputTab === 'url' && text ? 4 : 8}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Article text will appear here automatically when fetched, or you can paste your content directly..."
-            className="w-full max-h-32 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 leading-relaxed font-mono placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 resize-y"
+            placeholder="Article or story prose will appear here automatically, or you can paste your content directly..."
+            className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4 text-sm text-on-surface leading-relaxed font-serif placeholder:font-sans placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary shadow-inner resize-y"
           />
         </div>
 
@@ -570,7 +569,7 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
           <button
             onClick={handleCreateAndAnalyze}
             disabled={isAnalyzing || !text.trim()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-900/30 transition"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-on-primary hover:bg-primary-container disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-sm rounded-xl shadow-[0_0_24px_rgba(78,222,163,0.35)] transition-all cursor-pointer"
           >
             {isAnalyzing ? (
               <>

@@ -331,33 +331,33 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                 key={line.id}
                 className={`p-4 rounded-xl border transition ${
                   isPlaying
-                    ? 'bg-emerald-950/20 border-emerald-500 shadow-md shadow-emerald-950/30'
+                    ? 'bg-surface-container-high border-primary shadow-[0_0_20px_rgba(78,222,163,0.25)]'
                     : isLowConf
-                    ? 'bg-amber-950/20 border-amber-500/40'
+                    ? 'bg-error-container/10 border-error/30'
                     : isNarrator
-                    ? 'bg-slate-900/60 border-slate-800'
-                    : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                    ? 'bg-surface-container-low/70 border-outline-variant/30 hover:bg-surface-container-low'
+                    : 'bg-surface-container-low border-outline-variant/30 hover:bg-surface-container/70'
                 }`}
               >
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-mono text-slate-500 w-7">
+                    <span className="text-xs font-mono text-outline font-semibold w-7">
                       #{line.line_index + 1}
                     </span>
 
                     {/* Speaker selector dropdown */}
                     <div className="relative inline-flex items-center">
                       <span
-                        className="w-2.5 h-2.5 rounded-full mr-2"
-                        style={{ backgroundColor: char.color_accent || '#3B82F6' }}
+                        className="w-2.5 h-2.5 rounded-full mr-2 shadow-[0_0_8px_rgba(78,222,163,0.4)]"
+                        style={{ backgroundColor: char.color_accent || '#4edea3' }}
                       />
                       <select
                         value={line.speaker_id}
                         onChange={(e) => handleSpeakerChange(line.id, e.target.value)}
-                        className="bg-slate-950 border border-slate-700 text-slate-200 text-xs font-semibold rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500"
+                        className="bg-surface-container-high border border-outline-variant/40 text-on-surface text-xs font-semibold rounded-lg px-2.5 py-1 focus:outline-none focus:border-primary cursor-pointer"
                       >
                         {script.characters.map((c) => (
-                          <option key={c.id} value={c.id}>
+                          <option key={c.id} value={c.id} className="bg-surface-container-lowest text-on-surface">
                             {c.name} {c.id === 'narrator' ? '(Narration)' : ''}
                           </option>
                         ))}
@@ -365,13 +365,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                     </div>
 
                     {isLowConf && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-error-container/20 text-error border border-error/30">
                         <AlertTriangle className="w-3 h-3" />
                         Ambiguous
                       </span>
                     )}
 
-                    <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">
                       {line.type}
                     </span>
                   </div>
@@ -380,21 +380,21 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleToggleLinePreview(line.id)}
-                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium border transition ${
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition shadow-sm ${
                         isPlaying
-                          ? 'bg-red-500/20 text-red-400 border-red-500/40 hover:bg-red-500/30'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                          ? 'bg-error text-on-error border-error shadow-[0_0_12px_rgba(255,180,171,0.4)]'
+                          : 'bg-surface-container-high text-on-surface hover:bg-primary hover:text-on-primary border-outline-variant/30'
                       }`}
                       title={isPlaying ? "Stop audio preview" : "Audition line performance"}
                     >
                       {isPlaying ? (
                         <>
-                          <Square className="w-3 h-3 fill-red-400 text-red-400" />
+                          <Square className="w-3 h-3 fill-current text-current" />
                           <span>Stop</span>
                         </>
                       ) : (
                         <>
-                          <Play className="w-3 h-3 text-emerald-400 fill-emerald-400" />
+                          <Play className="w-3 h-3 text-primary fill-primary" />
                           <span>Audition</span>
                         </>
                       )}
@@ -402,22 +402,22 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                   </div>
                 </div>
 
-                {/* Line Spoken Text */}
-                <p className={`text-sm leading-relaxed ${isNarrator ? 'text-slate-300 italic' : 'text-white font-medium'}`}>
+                {/* Line Spoken Text - Newsreader Serif */}
+                <p className={`text-[17px] leading-[28px] font-serif ${isNarrator ? 'text-on-surface-variant italic font-normal' : 'text-on-surface font-medium'}`}>
                   {line.text}
                 </p>
 
                 {/* Delivery Notes & Sound Cues Bar */}
-                <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-slate-800/80 text-xs text-slate-400">
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-outline-variant/20 text-xs text-on-surface-variant">
                   {/* Directorial Emotion Tag */}
-                  <div className="flex items-center gap-1.5 bg-slate-950/80 px-2 py-1 rounded-md border border-slate-800">
-                    <Volume2 className="w-3 h-3 text-purple-400" />
+                  <div className="flex items-center gap-1.5 bg-surface-container-lowest px-2.5 py-1 rounded-md border border-outline-variant/30">
+                    <Volume2 className="w-3 h-3 text-tertiary" />
                     <input
                       type="text"
                       defaultValue={line.delivery?.emotion || ''}
                       placeholder="Add tone/emotion (e.g. whispering, curious)..."
                       onBlur={(e) => handleDeliveryChange(line.id, e.target.value)}
-                      className="bg-transparent text-slate-300 text-xs focus:outline-none placeholder:text-slate-600 w-44"
+                      className="bg-transparent text-on-surface text-xs focus:outline-none placeholder:text-on-surface-variant/40 w-44"
                     />
                   </div>
 
@@ -427,7 +427,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                       {line.sound_cues.map((cue) => (
                         <span
                           key={cue.id}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[11px]"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-secondary-container/20 text-secondary border border-secondary/30 text-[11px] font-mono"
                         >
                           <Tag className="w-2.5 h-2.5" />
                           {cue.tag} ({cue.placement})
