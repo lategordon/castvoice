@@ -211,21 +211,22 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium mb-3">
-          <Sparkles className="w-3.5 h-3.5" />
-          Full-Cast Audio Plays & Webpage Podcast Studio
+    <div className="h-full overflow-y-auto w-full">
+      <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 pb-36">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium mb-2">
+            <Sparkles className="w-3.5 h-3.5" />
+            Full-Cast Audio Plays & Webpage Podcast Studio
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Transform Web Articles & Prose into Audio
+          </h1>
+          <p className="mt-1 text-slate-400 max-w-xl mx-auto text-xs sm:text-sm">
+            Import any webpage URL or paste longform reading. Turn it into a <strong>2-host conversational podcast</strong>, 
+            a <strong>chaptered audio article</strong>, or a <strong>full-cast audio drama</strong>.
+          </p>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-          Transform Web Articles & Prose into Audio
-        </h1>
-        <p className="mt-2 text-slate-400 max-w-xl mx-auto text-sm">
-          Import any webpage URL or paste longform reading. Turn it into a <strong>2-host conversational podcast</strong>, 
-          a <strong>chaptered audio article</strong>, or a <strong>full-cast audio drama</strong>.
-        </p>
-      </div>
 
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
         {/* Step 1: Input Source Selector Tabs */}
@@ -307,10 +308,18 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
                     {urlMetadata.author && <span>by {urlMetadata.author}</span>}
                     {urlMetadata.site_name && <span className="text-slate-500">({urlMetadata.site_name})</span>}
                   </div>
-                  <div className="flex items-center gap-3 text-emerald-400 font-medium">
-                    <span>{wordCount.toLocaleString()} words</span>
-                    <span>•</span>
-                    <span>~{urlMetadata.reading_time_min} min read</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-emerald-400 font-medium">
+                      {wordCount.toLocaleString()} words • ~{urlMetadata.reading_time_min} min read
+                    </span>
+                    <button
+                      onClick={handleCreateAndAnalyze}
+                      disabled={isAnalyzing || !text.trim()}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold rounded-lg text-xs transition flex items-center gap-1.5 shrink-0 shadow-md shadow-emerald-950/40"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Create Audio Now
+                    </button>
                   </div>
                 </div>
               )}
@@ -364,11 +373,11 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
             </span>
           </div>
           <textarea
-            rows={inputTab === 'url' && text ? 6 : 9}
+            rows={inputTab === 'url' && text ? 3 : 5}
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Article text will appear here automatically when fetched, or you can paste your content directly..."
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-200 leading-relaxed font-mono placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 resize-y"
+            className="w-full max-h-32 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 leading-relaxed font-mono placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 resize-y"
           />
         </div>
 
@@ -582,5 +591,6 @@ Whether during an evening run, a morning commute, or while preparing dinner, lon
         </div>
       </div>
     </div>
+  </div>
   );
 };

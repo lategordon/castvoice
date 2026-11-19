@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Volume2, 
   Sparkles, 
@@ -12,18 +12,36 @@ import {
   Sliders, 
   Check, 
   Play, 
-  Loader2 
+  Square,
+  Loader2,
+  Mic,
+  ArrowRight,
+  Radio,
+  CheckCircle2
 } from 'lucide-react';
-import { ScriptDocument, ScriptLine, Character, SoundCuePlacement } from '../types/script';
+import { ScriptDocument, ScriptLine, Character, Voice, SoundCuePlacement } from '../types/script';
 
 interface ScriptEditorProps {
   script: ScriptDocument;
   onScriptUpdated: (newScript: ScriptDocument) => void;
+  onProceedToRender?: () => void;
 }
 
-export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpdated }) => {
-  const [selectedLineId, setSelectedLineId] = useState<string | null>(null);
+export const ScriptEditor: React.FC<ScriptEditorProps> = ({ 
+  script, 
+  onScriptUpdated,
+  onProceedToRender 
+}) => {
+  // Audio state
   const [playingLineId, setPlayingLineId] = useState<string | null>(null);
+  const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Voice Catalog state
+  const [voices, setVoices] = useState<Voice[]>([]);
+  const [loadingVoices, setLoadingVoices] = useState(true);
+
+  // Character Management modals
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
   const [mergeSourceId, setMergeSourceId] = useState<string>('');
   const [mergeTargetId, setMergeTargetId] = useState<string>('');
@@ -32,8 +50,50 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
 
   const characterMap = new Map<string, Character>(script.characters.map(c => [c.id, c]));
 
-  // Play line preview audio
-  const handlePlayLinePreview = async (lineId: string) => {
+  // Load voices catalog on mount
+  useEffect(() => {
+    fetch('/api/voices')
+      .then(res => res.json())
+      .then(data => {
+        setVoices(data);
+        setLoadingVoices(false);
+      })
+      .catch(err => {
+        console.error('Failed to load voices', err);
+        setLoadingVoices(false);
+      });
+
+    return () => {
+      // Cleanup any playing audio on unmount
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Stop any currently playing audio
+  const stopCurrentAudio = () => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+      currentAudioRef.current = null;
+    }
+    setPlayingLineId(null);
+    setPlayingVoiceId(null);
+  };
+
+  // Play / Stop single line preview audio
+  const handleToggleLinePreview = async (lineId: string) => {
+    // If currently playing this exact line, STOP IT
+    if (playingLineId === lineId) {
+      stopCurrentAudio();
+      return;
+    }
+
+    // Stop any other playing audio first
+    stopCurrentAudio();
+
     try {
       setPlayingLineId(lineId);
       const res = await fetch(`/api/voices/preview-line/${script.project_id}/${lineId}`, {
@@ -43,12 +103,76 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
-      audio.onended = () => setPlayingLineId(null);
-      audio.onerror = () => setPlayingLineId(null);
+      currentAudioRef.current = audio;
+
+      audio.onended = () => {
+        setPlayingLineId(null);
+        currentAudioRef.current = null;
+      };
+      audio.onerror = () => {
+        setPlayingLineId(null);
+        currentAudioRef.current = null;
+      };
       await audio.play();
     } catch (e) {
-      console.error(e);
+      console.error('Line preview error:', e);
       setPlayingLineId(null);
+      currentAudioRef.current = null;
+    }
+  };
+
+  // Play / Stop voice catalog audition sample
+  const handleToggleVoicePreview = async (voiceId: string) => {
+    if (playingVoiceId === voiceId) {
+      stopCurrentAudio();
+      return;
+    }
+
+    stopCurrentAudio();
+
+    try {
+      setPlayingVoiceId(voiceId);
+      const res = await fetch('/api/voices/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voice_id: voiceId })
+      });
+      if (!res.ok) throw new Error('Voice preview failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      currentAudioRef.current = audio;
+
+      audio.onended = () => {
+        setPlayingVoiceId(null);
+        currentAudioRef.current = null;
+      };
+      audio.onerror = () => {
+        setPlayingVoiceId(null);
+        currentAudioRef.current = null;
+      };
+      await audio.play();
+    } catch (e) {
+      console.error('Voice preview error:', e);
+      setPlayingVoiceId(null);
+      currentAudioRef.current = null;
+    }
+  };
+
+  // Assign voice to character
+  const handleAssignVoice = async (characterId: string, voiceId: string) => {
+    try {
+      const res = await fetch(`/api/projects/${script.project_id}/characters/${characterId}/voice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voice_id: voiceId })
+      });
+      if (res.ok) {
+        const updatedDoc = await res.json();
+        onScriptUpdated(updatedDoc);
+      }
+    } catch (e) {
+      console.error('Failed to assign voice:', e);
     }
   };
 
@@ -145,13 +269,39 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
     }
   };
 
-  // Count low confidence lines
   const lowConfidenceCount = script.lines.filter(l => l.confidence === 'low').length;
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden">
-      {/* Main Script Lines View */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+    <div className="flex flex-col lg:flex-row h-full overflow-hidden bg-slate-950">
+      {/* LEFT PANEL: Script Lines Review (~65% width) */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 border-r border-slate-800/80">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-400" />
+              Script Lines & Dialogue Directing
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Review dialogue attribution, delivery notes, and audio effects. Click preview on any line to audition.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {playingLineId && (
+              <button
+                onClick={stopCurrentAudio}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition animate-pulse"
+              >
+                <Square className="w-3.5 h-3.5 fill-red-400 text-red-400" />
+                Stop Preview
+              </button>
+            )}
+            <span className="text-xs text-slate-400 font-medium px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-lg">
+              {script.lines.length} lines total
+            </span>
+          </div>
+        </div>
+
         {/* Banner for low-confidence warnings */}
         {lowConfidenceCount > 0 && (
           <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 flex items-center justify-between text-amber-300 text-xs">
@@ -164,7 +314,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
           </div>
         )}
 
-        <div className="space-y-3 pb-20">
+        {/* Lines List */}
+        <div className="space-y-3 pb-24">
           {script.lines.map((line) => {
             const char = characterMap.get(line.speaker_id) || {
               id: line.speaker_id,
@@ -179,7 +330,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
               <div
                 key={line.id}
                 className={`p-4 rounded-xl border transition ${
-                  isLowConf
+                  isPlaying
+                    ? 'bg-emerald-950/20 border-emerald-500 shadow-md shadow-emerald-950/30'
+                    : isLowConf
                     ? 'bg-amber-950/20 border-amber-500/40'
                     : isNarrator
                     ? 'bg-slate-900/60 border-slate-800'
@@ -187,8 +340,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
                 }`}
               >
                 <div className="flex items-center justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-slate-500 w-8">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-mono text-slate-500 w-7">
                       #{line.line_index + 1}
                     </span>
 
@@ -201,7 +354,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
                       <select
                         value={line.speaker_id}
                         onChange={(e) => handleSpeakerChange(line.id, e.target.value)}
-                        className="bg-slate-950 border border-slate-700 text-slate-200 text-xs font-semibold rounded-lg px-2.5 py-1 focus:outline-none focus:border-emerald-500"
+                        className="bg-slate-950 border border-slate-700 text-slate-200 text-xs font-semibold rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500"
                       >
                         {script.characters.map((c) => (
                           <option key={c.id} value={c.id}>
@@ -214,67 +367,74 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
                     {isLowConf && (
                       <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
                         <AlertTriangle className="w-3 h-3" />
-                        Ambiguous Attribution
+                        Ambiguous
                       </span>
                     )}
 
-                    <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
+                    <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
                       {line.type}
                     </span>
                   </div>
 
-                  {/* Actions & Single-Line Audio Preview */}
+                  {/* Single-Line Audio Preview & STOP Button */}
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => handlePlayLinePreview(line.id)}
-                      disabled={isPlaying}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
-                      title="Preview this line's audio performance"
+                      onClick={() => handleToggleLinePreview(line.id)}
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium border transition ${
+                        isPlaying
+                          ? 'bg-red-500/20 text-red-400 border-red-500/40 hover:bg-red-500/30'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                      }`}
+                      title={isPlaying ? "Stop audio preview" : "Audition line performance"}
                     >
                       {isPlaying ? (
                         <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
-                          <span>Playing...</span>
+                          <Square className="w-3 h-3 fill-red-400 text-red-400" />
+                          <span>Stop</span>
                         </>
                       ) : (
                         <>
-                          <Play className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
-                          <span>Preview</span>
+                          <Play className="w-3 h-3 text-emerald-400 fill-emerald-400" />
+                          <span>Audition</span>
                         </>
                       )}
                     </button>
                   </div>
                 </div>
 
-                {/* Line text - 100% Verbatim */}
-                <p className={`text-sm leading-relaxed ${isNarrator ? 'text-slate-300 italic font-serif' : 'text-white font-sans'}`}>
+                {/* Line Spoken Text */}
+                <p className={`text-sm leading-relaxed ${isNarrator ? 'text-slate-300 italic' : 'text-white font-medium'}`}>
                   {line.text}
                 </p>
 
-                {/* Directorial & Foley tags */}
-                <div className="mt-3 flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/80">
-                  {/* Delivery direction editor */}
-                  <div className="flex items-center gap-1 text-xs text-slate-400 bg-slate-950 px-2 py-1 rounded-md border border-slate-800">
-                    <Sliders className="w-3 h-3 text-purple-400" />
+                {/* Delivery Notes & Sound Cues Bar */}
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-slate-800/80 text-xs text-slate-400">
+                  {/* Directorial Emotion Tag */}
+                  <div className="flex items-center gap-1.5 bg-slate-950/80 px-2 py-1 rounded-md border border-slate-800">
+                    <Volume2 className="w-3 h-3 text-purple-400" />
                     <input
                       type="text"
-                      placeholder="Delivery (e.g. whisper, angry)"
-                      value={line.delivery?.emotion || ''}
-                      onChange={(e) => handleDeliveryChange(line.id, e.target.value)}
-                      className="bg-transparent text-slate-200 placeholder:text-slate-600 focus:outline-none w-48 text-xs"
+                      defaultValue={line.delivery?.emotion || ''}
+                      placeholder="Add tone/emotion (e.g. whispering, curious)..."
+                      onBlur={(e) => handleDeliveryChange(line.id, e.target.value)}
+                      className="bg-transparent text-slate-300 text-xs focus:outline-none placeholder:text-slate-600 w-44"
                     />
                   </div>
 
-                  {/* Sound cues badges */}
-                  {line.sound_cues.map((cue) => (
-                    <span
-                      key={cue.id}
-                      className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-300 font-mono"
-                    >
-                      <Volume2 className="w-3 h-3 text-blue-400" />
-                      [{cue.placement}: {cue.tag}]
-                    </span>
-                  ))}
+                  {/* Sound Cues */}
+                  {line.sound_cues && line.sound_cues.length > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      {line.sound_cues.map((cue) => (
+                        <span
+                          key={cue.id}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[11px]"
+                        >
+                          <Tag className="w-2.5 h-2.5" />
+                          {cue.tag} ({cue.placement})
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -282,63 +442,155 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
         </div>
       </div>
 
-      {/* Right Sidebar: Character Ledger & Tools */}
-      <div className="w-80 border-l border-slate-800 bg-slate-900/40 p-5 overflow-y-auto flex flex-col justify-between">
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2">
-              <Users className="w-4 h-4 text-emerald-400" />
-              Character Ledger
-            </h3>
-            <button
-              onClick={() => setShowMergeModal(true)}
-              className="text-xs text-slate-400 hover:text-slate-200 inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-800 border border-slate-700"
-            >
-              <Merge className="w-3 h-3" />
-              Merge
-            </button>
+      {/* RIGHT PANEL: Voice Casting & Character Ledger (~35% width) */}
+      <div className="w-full lg:w-[420px] bg-slate-900/90 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-full overflow-hidden shrink-0">
+        {/* Right Header & Proceed CTA */}
+        <div className="p-4 border-b border-slate-800 bg-slate-950/70 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Mic className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                Voice Casting & Cast
+              </h3>
+            </div>
+            <span className="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono">
+              {script.characters.length} cast
+            </span>
           </div>
 
-          <div className="space-y-2.5">
-            {script.characters.map((char) => {
-              const lineCount = script.lines.filter(l => l.speaker_id === char.id).length;
-              return (
-                <div
-                  key={char.id}
-                  className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2.5 truncate">
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            Assign unique neural voices to your hosts, narrator, and characters. Audition voice samples directly.
+          </p>
+
+          {/* Proceed to Render CTA */}
+          {onProceedToRender && (
+            <button
+              onClick={onProceedToRender}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-emerald-950/50 transition"
+            >
+              <Sparkles className="w-4 h-4" />
+              Proceed to Render & Mix Full Play
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              onClick={() => setShowMergeModal(true)}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition"
+            >
+              <Merge className="w-3 h-3 text-blue-400" />
+              Merge Duplicates
+            </button>
+          </div>
+        </div>
+
+        {/* Character Voice Assignment Cards */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+          {script.characters.map((char) => {
+            const isNarrator = char.id === 'narrator';
+            const lineCount = script.lines.filter(l => l.speaker_id === char.id).length;
+            const assignedVoiceId = char.voice_id || (isNarrator ? 'en-US-GuyNeural' : 'en-US-JennyNeural');
+            const assignedVoice = voices.find(v => v.id === assignedVoiceId);
+            const isAuditioning = playingVoiceId === assignedVoiceId;
+
+            return (
+              <div
+                key={char.id}
+                className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 space-y-2.5 hover:border-slate-700 transition"
+              >
+                {/* Character Name & Info */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
                     <span
                       className="w-3 h-3 rounded-full shrink-0"
                       style={{ backgroundColor: char.color_accent || '#3B82F6' }}
                     />
-                    <div className="truncate">
-                      <p className="text-xs font-semibold text-white truncate">{char.name}</p>
-                      <p className="text-[11px] text-slate-500">
-                        {lineCount} line{lineCount !== 1 ? 's' : ''} {char.aliases.length > 0 ? `• alias: ${char.aliases.slice(0, 2).join(', ')}` : ''}
-                      </p>
-                    </div>
+                    <span className="text-xs font-bold text-white truncate">
+                      {char.name}
+                    </span>
+                    {isNarrator && (
+                      <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">
+                        Narrator
+                      </span>
+                    )}
                   </div>
 
-                  <button
-                    onClick={() => {
-                      setEditingCharacter(char);
-                      setRenameInput(char.name);
-                    }}
-                    className="p-1 hover:bg-slate-800 text-slate-400 hover:text-white rounded transition"
-                    title="Rename character"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-slate-500 font-mono">
+                      {lineCount} lines
+                    </span>
+                    <button
+                      onClick={() => {
+                        setEditingCharacter(char);
+                        setRenameInput(char.name);
+                      }}
+                      className="p-1 hover:bg-slate-800 text-slate-400 hover:text-white rounded"
+                      title="Rename character"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Voice Selection Dropdown & Audition Preview */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 block">
+                    Assigned Voice
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assignedVoiceId}
+                      onChange={(e) => handleAssignVoice(char.id, e.target.value)}
+                      className="flex-1 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500 truncate"
+                    >
+                      {voices.map((v) => (
+                        <option key={v.id} value={v.id}>
+                          {v.name} ({v.gender}, {v.accent})
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* Audition Play / STOP Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleVoicePreview(assignedVoiceId)}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition ${
+                        isAuditioning
+                          ? 'bg-red-500/20 text-red-400 border-red-500/40 hover:bg-red-500/30'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                      }`}
+                      title={isAuditioning ? "Stop audition sample" : "Audition voice sample"}
+                    >
+                      {isAuditioning ? (
+                        <>
+                          <Square className="w-3 h-3 fill-red-400 text-red-400" />
+                          <span>Stop</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-3 h-3 text-emerald-400 fill-emerald-400" />
+                          <span>Sample</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Voice description snippet */}
+                {assignedVoice && (
+                  <p className="text-[10px] text-slate-500 italic truncate">
+                    Preview: "{assignedVoice.preview_text}"
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Character Rename Modal */}
         {editingCharacter && (
-          <div className="mt-4 p-4 bg-slate-950 border border-slate-700 rounded-xl">
+          <div className="p-4 bg-slate-950 border-t border-slate-800">
             <h4 className="text-xs font-semibold text-white mb-2">Rename Character</h4>
             <input
               type="text"
@@ -365,13 +617,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
 
         {/* Merge Characters Modal */}
         {showMergeModal && (
-          <div className="mt-4 p-4 bg-slate-950 border border-slate-700 rounded-xl space-y-3">
+          <div className="p-4 bg-slate-950 border-t border-slate-800 space-y-2.5">
             <h4 className="text-xs font-semibold text-white">Merge Duplicate Characters</h4>
-            <p className="text-[11px] text-slate-400">
-              Reassign all lines from the source character to the target character and consolidate aliases.
+            <p className="text-[10px] text-slate-400">
+              Reassign all lines from source to target character.
             </p>
             <div>
-              <label className="text-[11px] text-slate-500 block mb-1">Source (Will be deleted):</label>
+              <label className="text-[10px] text-slate-500 block mb-1">Source (Will be deleted):</label>
               <select
                 value={mergeSourceId}
                 onChange={(e) => setMergeSourceId(e.target.value)}
@@ -384,7 +636,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onScriptUpda
               </select>
             </div>
             <div>
-              <label className="text-[11px] text-slate-500 block mb-1">Target (Keeps lines):</label>
+              <label className="text-[10px] text-slate-500 block mb-1">Target (Keeps lines):</label>
               <select
                 value={mergeTargetId}
                 onChange={(e) => setMergeTargetId(e.target.value)}

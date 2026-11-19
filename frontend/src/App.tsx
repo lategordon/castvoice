@@ -112,7 +112,7 @@ export const App: React.FC = () => {
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              1. Story Text
+              1. Story / URL Text
             </button>
 
             <button
@@ -122,17 +122,7 @@ export const App: React.FC = () => {
               }`}
             >
               <FileEdit className="w-3.5 h-3.5" />
-              2. Review Script ({currentScript.lines.length})
-            </button>
-
-            <button
-              onClick={() => setActiveTab('casting')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
-                activeTab === 'casting' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Mic className="w-3.5 h-3.5" />
-              3. Cast Voices ({currentScript.characters.length})
+              2. Review Script & Cast Voices ({currentScript.characters.length})
             </button>
 
             <button
@@ -142,7 +132,7 @@ export const App: React.FC = () => {
               }`}
             >
               <PlayCircle className="w-3.5 h-3.5" />
-              4. Render & Play
+              3. Render & Play
             </button>
           </div>
         )}
@@ -161,7 +151,7 @@ export const App: React.FC = () => {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-hidden relative">
+      <main className="flex-1 overflow-y-auto relative min-h-0">
         {activeTab === 'upload' && (
           <UploadView
             onProjectCreated={handleProjectCreated}
@@ -171,13 +161,6 @@ export const App: React.FC = () => {
 
         {activeTab === 'editor' && currentScript && (
           <ScriptEditor
-            script={currentScript}
-            onScriptUpdated={(updated) => setCurrentScript(updated)}
-          />
-        )}
-
-        {activeTab === 'casting' && currentScript && (
-          <VoiceCasting
             script={currentScript}
             onScriptUpdated={(updated) => setCurrentScript(updated)}
             onProceedToRender={() => setActiveTab('player')}

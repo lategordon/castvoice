@@ -76,7 +76,8 @@ export const VoiceCasting: React.FC<VoiceCastingProps> = ({
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-6">
+    <div className="h-full overflow-y-auto w-full">
+      <div className="max-w-5xl mx-auto py-8 px-6 pb-32">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-slate-800 gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -199,5 +200,6 @@ export const VoiceCasting: React.FC<VoiceCastingProps> = ({
         })}
       </div>
     </div>
+  </div>
   );
 };
