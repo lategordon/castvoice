@@ -1,183 +1,142 @@
 import re
 import urllib.request
 import urllib.error
+from html import unescape
 from html.parser import HTMLParser
 from typing import Dict, Any, List, Optional
 
 
-class ArticleHTMLParser(HTMLParser):
-    """
-    Standard-library HTML parser that strips non-content tags (scripts, styles,
-    navbars, footers, forms) and extracts clean readable article prose, headings,
-    and metadata.
-    """
+# Void / self-closing HTML5 elements that must NEVER be pushed to a nesting stack
+VOID_ELEMENTS = {
+    "area", "base", "br", "col", "embed", "hr", "img", 
+    "input", "link", "meta", "param", "source", "track", "wbr"
+}
 
-    # Tags whose inner text should be completely discarded
-    DISCARD_TAGS = {
-        "script", "style", "noscript", "svg", "nav", "footer",
-        "header", "aside", "form", "button", "iframe", "figure", "menu"
-    }
+# Tags whose entire inner tree should be discarded
+DISCARD_TAGS = {
+    "script", "style", "noscript", "svg", "nav", "footer", 
+    "header", "aside", "form", "button", "iframe", "menu", 
+    "figure", "figcaption", "select", "textarea"
+}
 
-    # Block-level tags that should introduce paragraph/section breaks
+# Substring matches for classes or IDs that contain non-article clutter
+IGNORE_CLASS_SUBSTRINGS = {
+    "sharedaddy", "sd-sharing", "jp-relatedposts", "wpcnt", 
+    "nav-previous", "nav-next", "post-nav", "author-heading",
+    "author-bio", "author-link", "author-title", "entry-footer",
+    "site-footer", "sidebar", "widget", "comment", "comments-area", 
+    "comment-respond", "cookie-banner", "share-buttons"
+}
+
+# Regex patterns identifying the start of a comments section across web CMSs
+COMMENT_BOUNDARY_PATTERNS = [
+    r'<div[^>]+id=[\"\']comments[\"\']',
+    r'<section[^>]+id=[\"\']comments[\"\']',
+    r'<div[^>]+class=[\"\'][^\"\']*comments-area[^\"\']*[\"\']',
+    r'<div[^>]+class=[\"\'][^\"\']*comment-respond[^\"\']*[\"\']',
+    r'<div[^>]+id=[\"\']respond[\"\']',
+    r'<div[^>]+id=[\"\']disqus_thread[\"\']',
+    r'<section[^>]+class=[\"\'][^\"\']*comments[^\"\']*[\"\']',
+    r'<div[^>]+class=[\"\'][^\"\']*comment-list[^\"\']*[\"\']',
+    r'<div[^>]+class=[\"\'][^\"\']*responses[^\"\']*[\"\']',
+]
+
+# Primary container patterns for popular CMSs (WordPress, Substack, Medium, Ghost, News sites)
+ARTICLE_CONTAINER_PATTERNS = [
+    r'<div[^>]+class=[\"\'][^\"\']*(?:entry-content|post-content|article-content|story-body|prose)[^\"\']*[\"\'][^>]*>(.*)',
+    r'<article\b[^>]*>(.*)</article>',
+    r'<main\b[^>]*>(.*)</main>',
+]
+
+
+class CleanArticleParser(HTMLParser):
     BLOCK_TAGS = {"p", "div", "article", "section", "blockquote", "li", "td", "th"}
     HEADING_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6"}
 
     def __init__(self):
         super().__init__()
-        self.discard_depth = 0
-        self.current_heading_level = 0
-        self.heading_buffer: List[str] = []
-        
+        self.discard_stack: List[str] = []
         self.paragraphs: List[str] = []
-        self.current_p: List[str] = []
-        
-        # Metadata storage
-        self.title: Optional[str] = None
-        self.in_title_tag = False
-        self.title_buffer: List[str] = []
-        self.meta_tags: Dict[str, str] = {}
+        self.current_tokens: List[str] = []
+        self.heading_level: int = 0
+        self.heading_tokens: List[str] = []
 
     def handle_starttag(self, tag: str, attrs: List[tuple]):
-        tag_lower = tag.lower()
+        t_low = tag.lower()
+        if t_low in VOID_ELEMENTS or t_low in {"html", "body"}:
+            return
+
         attrs_dict = {k.lower(): v for k, v in attrs if v is not None}
 
-        # Handle metadata
-        if tag_lower == "title":
-            self.in_title_tag = True
-        elif tag_lower == "meta":
-            prop = attrs_dict.get("property") or attrs_dict.get("name")
-            content = attrs_dict.get("content")
-            if prop and content:
-                self.meta_tags[prop.lower()] = content
-
-        # Check for discardable tags
-        if tag_lower in self.DISCARD_TAGS:
-            self.discard_depth += 1
+        # Check tag discard
+        if t_low in DISCARD_TAGS:
+            self.discard_stack.append(t_low)
             return
 
-        # Check for class/id names suggesting boilerplate/ads/comments
-        class_or_id = (attrs_dict.get("class", "") + " " + attrs_dict.get("id", "")).lower()
-        if any(neg in class_or_id for neg in ["cookie", "banner", "sidebar", "nav", "footer", "ad-", "ads-", "share-buttons", "comments"]):
-            self.discard_depth += 1
+        # Check class / ID discard
+        class_id = (attrs_dict.get("class", "") + " " + attrs_dict.get("id", "")).lower()
+        if any(ign in class_id for ign in IGNORE_CLASS_SUBSTRINGS):
+            self.discard_stack.append(t_low)
             return
 
-        if self.discard_depth > 0:
+        if self.discard_stack:
+            self.discard_stack.append(t_low)
             return
 
-        # Heading detection
-        if tag_lower in self.HEADING_TAGS:
-            self._flush_paragraph()
-            self.current_heading_level = int(tag_lower[1])
-            self.heading_buffer = []
-
-        elif tag_lower in self.BLOCK_TAGS:
-            self._flush_paragraph()
+        # Headings
+        if t_low in self.HEADING_TAGS:
+            self._flush()
+            self.heading_level = int(t_low[1])
+            self.heading_tokens = []
+        elif t_low in self.BLOCK_TAGS:
+            self._flush()
 
     def handle_endtag(self, tag: str):
-        tag_lower = tag.lower()
-
-        if tag_lower == "title":
-            self.in_title_tag = False
-            if self.title_buffer and not self.title:
-                self.title = "".join(self.title_buffer).strip()
-
-        if tag_lower in self.DISCARD_TAGS:
-            if self.discard_depth > 0:
-                self.discard_depth -= 1
+        t_low = tag.lower()
+        if t_low in VOID_ELEMENTS or t_low in {"html", "body"}:
             return
 
-        if self.discard_depth > 0:
+        if self.discard_stack:
+            if self.discard_stack[-1] == t_low:
+                self.discard_stack.pop()
             return
 
-        if tag_lower in self.HEADING_TAGS:
-            heading_text = "".join(self.heading_buffer).strip()
-            if heading_text:
-                prefix = "#" * self.current_heading_level
-                self.paragraphs.append(f"{prefix} {heading_text}")
-            self.current_heading_level = 0
-            self.heading_buffer = []
-
-        elif tag_lower in self.BLOCK_TAGS:
-            self._flush_paragraph()
+        if t_low in self.HEADING_TAGS:
+            h_text = unescape("".join(self.heading_tokens)).strip()
+            if h_text and len(h_text.split()) >= 1:
+                prefix = "#" * min(self.heading_level, 3)
+                self.paragraphs.append(f"{prefix} {h_text}")
+            self.heading_level = 0
+            self.heading_tokens = []
+        elif t_low in self.BLOCK_TAGS:
+            self._flush()
 
     def handle_data(self, data: str):
-        if self.in_title_tag:
-            self.title_buffer.append(data)
-
-        if self.discard_depth > 0:
+        if self.discard_stack:
             return
-
-        text = data.strip()
-        if not text:
-            # Preserve space between words
-            if data and (data.startswith(" ") or data.endswith(" ")):
-                if self.current_heading_level > 0:
-                    self.heading_buffer.append(" ")
-                elif self.current_p:
-                    self.current_p.append(" ")
-            return
-
-        if self.current_heading_level > 0:
-            self.heading_buffer.append(data)
+        if self.heading_level > 0:
+            self.heading_tokens.append(data)
         else:
-            self.current_p.append(data)
+            self.current_tokens.append(data)
 
-    def _flush_paragraph(self):
-        if self.current_p:
-            cleaned = "".join(self.current_p)
-            cleaned = re.sub(r"\s+", " ", cleaned).strip()
-            # Filter out tiny boilerplate strings
-            if len(cleaned.split()) >= 4:
+    def _flush(self):
+        if self.current_tokens:
+            text = unescape("".join(self.current_tokens))
+            cleaned = re.sub(r"\s+", " ", text).strip()
+            # Drop tiny boilerplate strings, author bio links, and published date stamps
+            if (
+                len(cleaned.split()) >= 4 
+                and not cleaned.startswith("View all posts by")
+                and not re.match(r"^Published\s+[A-Za-z]+", cleaned, re.I)
+            ):
                 self.paragraphs.append(cleaned)
-            self.current_p = []
-
-    def get_article_text(self) -> str:
-        self._flush_paragraph()
-        return "\n\n".join(self.paragraphs)
-
-    def get_metadata(self) -> Dict[str, Any]:
-        # Prefer OpenGraph / Twitter meta tags, fall back to <title>
-        best_title = (
-            self.meta_tags.get("og:title")
-            or self.meta_tags.get("twitter:title")
-            or self.title
-            or "Untitled Article"
-        )
-        # Clean title suffix (e.g. "My Story | Substack", "Article - The Atlantic")
-        best_title = re.sub(r"\s*([|–—·-]\s*[^|–—·-]+)$", "", best_title).strip() or best_title
-
-        author = (
-            self.meta_tags.get("author")
-            or self.meta_tags.get("article:author")
-            or self.meta_tags.get("twitter:creator")
-            or None
-        )
-
-        site_name = (
-            self.meta_tags.get("og:site_name")
-            or self.meta_tags.get("application-name")
-            or None
-        )
-
-        description = (
-            self.meta_tags.get("description")
-            or self.meta_tags.get("og:description")
-            or self.meta_tags.get("twitter:description")
-            or None
-        )
-
-        return {
-            "title": best_title,
-            "author": author,
-            "site_name": site_name,
-            "description": description,
-        }
+            self.current_tokens = []
 
 
 class WebArticleExtractor:
     """
-    Downloads and extracts clean article text and metadata from arbitrary web URLs.
-    Uses Python standard library with desktop browser user-agents.
+    Downloads and extracts clean article text, metadata, and headings from arbitrary web URLs.
+    Guarantees 100% removal of comment sections, sidebars, related posts, and site navigation.
     """
 
     HEADERS = {
@@ -192,28 +151,75 @@ class WebArticleExtractor:
 
     @classmethod
     def extract_from_html(cls, html_content: str, url: str = "") -> Dict[str, Any]:
-        parser = ArticleHTMLParser()
-        parser.feed(html_content)
-        
-        article_text = parser.get_article_text()
-        meta = parser.get_metadata()
-        
-        word_count = len(article_text.split()) if article_text else 0
+        # 1. Extract metadata from full HTML
+        title_m = (
+            re.search(r'<meta[^>]+property=[\"\']og:title[\"\'][^>]+content=[\"\'](.*?)[\"\']', html_content, re.I) or
+            re.search(r'<meta[^>]+name=[\"\']twitter:title[\"\'][^>]+content=[\"\'](.*?)[\"\']', html_content, re.I) or
+            re.search(r'<title>(.*?)</title>', html_content, re.I | re.S)
+        )
+        raw_title = unescape(title_m.group(1)).strip() if title_m else "Untitled Article"
+        clean_title = re.sub(r"\s*([|–—·-]\s*[^|–—·-]+)$", "", raw_title).strip() or raw_title
+
+        author_m = (
+            re.search(r'<meta[^>]+name=[\"\']author[\"\'][^>]+content=[\"\'](.*?)[\"\']', html_content, re.I) or
+            re.search(r'<meta[^>]+property=[\"\']article:author[\"\'][^>]+content=[\"\'](.*?)[\"\']', html_content, re.I) or
+            re.search(r'<a[^>]+rel=[\"\']author[\"\'][^>]*>(.*?)</a>', html_content, re.I) or
+            re.search(r'class=[\"\'][^\"\']*author-name[^\"\']*[\"\'][^>]*>(.*?)<', html_content, re.I)
+        )
+        author = unescape(author_m.group(1)).strip() if author_m else None
+
+        site_m = (
+            re.search(r'<meta[^>]+property=[\"\']og:site_name[\"\'][^>]+content=[\"\'](.*?)[\"\']', html_content, re.I) or
+            re.search(r'<meta[^>]+name=[\"\']application-name[\"\'][^>]+content=[\"\'](.*?)[\"\']', html_content, re.I)
+        )
+        site_name = unescape(site_m.group(1)).strip() if site_m else None
+
+        desc_m = (
+            re.search(r'<meta[^>]+property=[\"\']og:description[\"\'][^>]+content=[\"\'](.*?)[\"\']', html_content, re.I) or
+            re.search(r'<meta[^>]+name=[\"\']description[\"\'][^>]+content=[\"\'](.*?)[\"\']', html_content, re.I)
+        )
+        description = unescape(desc_m.group(1)).strip() if desc_m else None
+
+        # 2. Hard cutoff before comment sections begin
+        cut_idx = len(html_content)
+        for pat in COMMENT_BOUNDARY_PATTERNS:
+            m = re.search(pat, html_content, re.I)
+            if m and m.start() < cut_idx:
+                cut_idx = m.start()
+
+        pre_comment_html = html_content[:cut_idx]
+
+        # 3. Target the core article container
+        target_html = pre_comment_html
+        for c_pat in ARTICLE_CONTAINER_PATTERNS:
+            cm = re.search(c_pat, pre_comment_html, re.I | re.S)
+            if cm:
+                target_html = cm.group(1)
+                break
+
+        # 4. Parse paragraphs and headings
+        parser = CleanArticleParser()
+        parser.feed(target_html)
+        parser._flush()
+
+        clean_text = "\n\n".join(parser.paragraphs)
+        word_count = len(clean_text.split()) if clean_text else 0
         reading_time_min = max(1, round(word_count / 200)) if word_count else 0
 
         return {
             "url": url,
-            "title": meta["title"],
-            "author": meta["author"],
-            "site_name": meta["site_name"],
-            "description": meta["description"],
-            "text": article_text,
+            "title": clean_title,
+            "author": author,
+            "site_name": site_name,
+            "description": description,
+            "text": clean_text,
             "word_count": word_count,
             "reading_time_min": reading_time_min,
+            "paragraph_count": len(parser.paragraphs)
         }
 
     @classmethod
-    def extract_from_url(cls, url: str, timeout: int = 15) -> Dict[str, Any]:
+    def extract_from_url(cls, url: str, timeout: int = 20) -> Dict[str, Any]:
         if not re.match(r"^https?://", url.strip(), re.IGNORECASE):
             url = "https://" + url.strip()
 

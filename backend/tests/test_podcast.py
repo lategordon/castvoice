@@ -40,6 +40,34 @@ def test_web_article_extractor_html():
     assert data["word_count"] > 10
 
 
+def test_web_article_extractor_strips_comments():
+    sample_html_with_comments = """
+    <!DOCTYPE html>
+    <html>
+    <head><title>History of Navigation – Maritime Blog</title></head>
+    <body class="single has-sidebar">
+        <div class="entry-content">
+            <h1>History of Navigation</h1>
+            <p>Early mariners navigated primarily by celestial observations and coastal landmarks.</p>
+            <p>Modern global commerce depends deeply upon continuous naval surveillance and sea-lane protection.</p>
+        </div>
+        <div id="comments" class="comments-area">
+            <h2>3 Comments</h2>
+            <div class="comment-content"><p>Great article! But what about Polynesian wayfinding?</p></div>
+            <div class="comment-content"><p>I completely disagree with the conclusion.</p></div>
+        </div>
+    </body>
+    </html>
+    """
+    data = WebArticleExtractor.extract_from_html(sample_html_with_comments, url="https://example.com/nav")
+    assert "Early mariners navigated primarily" in data["text"]
+    assert "Modern global commerce depends" in data["text"]
+    # Comments must NOT be present
+    assert "Polynesian wayfinding" not in data["text"]
+    assert "completely disagree with the conclusion" not in data["text"]
+    assert "3 Comments" not in data["text"]
+
+
 def test_podcast_conversation_mock():
     analyzer = GeminiScriptAnalyzer(force_mock=True)
     article = (
