@@ -13,6 +13,7 @@ from app.models.project import (
 )
 from app.models.script import ScriptDocument, ScriptLine
 from app.services.ingestion import TextIngestionService
+from app.services.document_extractor import DocumentExtractor
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -46,20 +47,43 @@ def create_project(req: CreateProjectRequest, store: ProjectStore = Depends(get_
     return store.create_project(title=req.title, text=text)
 
 
+@router.post("/parse-document")
+async def parse_document(
+    file: UploadFile = File(...)
+):
+    """
+    Parses an uploaded file (.pdf, .docx, .txt, .md) and returns its
+    extracted text, detected title, author, page count, and word count.
+    Used by the frontend to populate the prose content textarea and metadata.
+    """
+    filename = file.filename or "document"
+    contents = await file.read()
+    try:
+        extracted = DocumentExtractor.extract_from_bytes(contents, filename)
+        return extracted
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @router.post("/upload", response_model=ProjectMetadata)
 async def upload_file(
     file: UploadFile = File(...),
     title: Optional[str] = Form(None),
     store: ProjectStore = Depends(get_project_store)
 ):
-    filename = file.filename or "uploaded_story.txt"
-    proj_title = title or filename.rsplit(".", 1)[0].replace("_", " ").title()
-
+    filename = file.filename or "uploaded_story"
     contents = await file.read()
     try:
-        text = contents.decode("utf-8")
-    except UnicodeDecodeError:
-        text = contents.decode("latin-1", errors="replace")
+        extracted = DocumentExtractor.extract_from_bytes(contents, filename)
+        text = extracted["text"]
+        proj_title = title or extracted.get("title") or filename.rsplit(".", 1)[0].replace("_", " ").title()
+    except Exception as e:
+        # Fallback to plain text decode if document extractor threw an error
+        try:
+            text = contents.decode("utf-8")
+        except UnicodeDecodeError:
+            text = contents.decode("latin-1", errors="replace")
+        proj_title = title or filename.rsplit(".", 1)[0].replace("_", " ").title()
 
     return store.create_project(title=proj_title, text=text)
 

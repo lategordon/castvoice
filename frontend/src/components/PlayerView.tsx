@@ -191,7 +191,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-surface">
       {/* Audio Element */}
       {hasRendered && (
         <audio
@@ -209,30 +209,30 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
 
       {/* Render Prompt Bar if not yet rendered */}
       {!hasRendered && (
-        <div className="p-8 max-w-2xl mx-auto text-center my-auto">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center mb-4">
+        <div className="p-10 max-w-2xl mx-auto text-center my-auto bg-white border border-border-hairline rounded-2xl shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-primary mx-auto flex items-center justify-center mb-5">
             <Music className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Ready to Render Full Audio Play</h2>
-          <p className="text-slate-400 text-sm mb-6">
-            Synthesizes all {script.lines.length} lines with neural voices, adds pauses, and mixes in Foley sound effects 
+          <h2 className="text-2xl font-serif text-ink-primary mb-2 font-normal">Ready to Render Full Audio Play</h2>
+          <p className="text-ink-muted text-sm mb-6 leading-relaxed">
+            Synthesizes all {script.lines.length} lines with neural voices, adds dramatic pauses, and mixes in Foley sound effects 
             with automatic -6dB background ducking.
           </p>
 
           {isRendering ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 text-left">
-              <div className="flex justify-between items-center text-xs text-slate-300 mb-2">
+            <div className="bg-surface border border-border-hairline rounded-xl p-6 text-left">
+              <div className="flex justify-between items-center text-xs text-ink-secondary mb-2">
                 <span className="font-medium flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
                   {renderProgress.status}
                 </span>
-                <span>
+                <span className="font-mono text-ink-muted">
                   {renderProgress.current} / {renderProgress.total} lines
                 </span>
               </div>
-              <div className="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800">
+              <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden border border-border-hairline">
                 <div
-                  className="bg-emerald-500 h-2.5 rounded-full transition-all duration-300"
+                  className="bg-primary h-2.5 rounded-full transition-all duration-300"
                   style={{
                     width: `${renderProgress.total ? (renderProgress.current / renderProgress.total) * 100 : 0}%`
                   }}
@@ -242,9 +242,9 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
           ) : (
             <button
               onClick={handleRender}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-xl shadow-emerald-950/50 transition text-base"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary hover:bg-primary-container text-white font-medium rounded-xl shadow-md shadow-emerald-900/10 transition text-sm cursor-pointer"
             >
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-4 h-4" />
               Render Full-Cast Audio Play
             </button>
           )}
@@ -253,22 +253,22 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
 
       {/* Synchronized Transcript View */}
       {hasRendered && (
-        <div className="flex-1 overflow-y-auto p-6 space-y-3 pb-32">
-          <div className="max-w-4xl mx-auto space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs text-slate-400">
-              <span>Synchronized Transcript (Click any line to jump audio)</span>
+        <div className="flex-1 overflow-y-auto p-6 space-y-3 pb-36">
+          <div className="max-w-4xl mx-auto space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-border-hairline text-xs text-ink-muted">
+              <span className="font-medium">Synchronized Transcript (Click any line to jump audio)</span>
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleRender}
                   disabled={isRendering}
-                  className="hover:text-emerald-400 transition flex items-center gap-1"
+                  className="hover:text-primary transition flex items-center gap-1.5 font-medium cursor-pointer"
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
-                  Re-render (Cached)
+                  Re-render
                 </button>
                 <button
                   onClick={downloadScriptJson}
-                  className="hover:text-blue-400 transition flex items-center gap-1"
+                  className="hover:text-ink-primary transition flex items-center gap-1.5 font-medium cursor-pointer"
                 >
                   <FileJson className="w-3.5 h-3.5" />
                   Export Script JSON
@@ -276,7 +276,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
                 <a
                   href={`/api/projects/${script.project_id}/audio`}
                   download={`${script.title.toLowerCase().replace(/\s+/g, '_')}.mp3`}
-                  className="hover:text-emerald-400 transition flex items-center gap-1"
+                  className="hover:text-primary transition flex items-center gap-1.5 font-medium"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download Master MP3
@@ -299,21 +299,22 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
                   key={line.id}
                   ref={el => { lineRefs.current[line.id] = el; }}
                   onClick={() => manifestLine && handleLineClick(manifestLine)}
-                  className={`p-4 rounded-xl border cursor-pointer transition duration-200 ${
+                  style={{ borderLeftColor: char.color_accent || '#006948' }}
+                  className={`p-5 rounded-xl border border-border-hairline border-l-4 cursor-pointer transition duration-150 ${
                     isActive
-                      ? 'bg-surface-container-high border-primary shadow-[0_0_24px_rgba(78,222,163,0.2)] scale-[1.01]'
+                      ? 'bg-emerald-50/60 border-primary/50 shadow-[0_2px_12px_rgba(0,105,72,0.08)] scale-[1.005]'
                       : isNarrator
-                      ? 'bg-surface-container-low/60 border-outline-variant/30 hover:bg-surface-container-low'
-                      : 'bg-surface-container-low border-outline-variant/30 hover:bg-surface-container/70'
+                      ? 'bg-white/70 hover:bg-white shadow-[0_1px_2px_rgba(15,23,42,0.02)]'
+                      : 'bg-white hover:border-slate-300 shadow-[0_1px_2px_rgba(15,23,42,0.03)]'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span
-                        className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(78,222,163,0.5)]"
-                        style={{ backgroundColor: char.color_accent || '#4edea3' }}
+                        className="w-2.5 h-2.5 rounded-full"
+                        style={{ backgroundColor: char.color_accent || '#006948' }}
                       />
-                      <span className="text-xs font-bold text-on-surface">
+                      <span className="text-xs font-semibold text-ink-primary">
                         {char.name}
                       </span>
                       {line.delivery?.emotion && (
@@ -325,24 +326,24 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
 
                     <div className="flex items-center gap-2">
                       {manifestLine && (
-                        <span className="text-[11px] font-mono text-outline">
+                        <span className="text-[11px] font-mono text-ink-muted">
                           {formatTime(manifestLine.start_time_ms)}
                         </span>
                       )}
                       {isActive && (
-                        <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(78,222,163,0.9)] animate-pulse" />
+                        <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(0,105,72,0.6)] animate-pulse" />
                       )}
                     </div>
                   </div>
 
-                  <p className={`text-[17px] leading-[28px] font-serif ${isNarrator ? 'text-on-surface-variant italic font-normal' : 'text-on-surface font-medium'}`}>
+                  <p className={`text-[19px] leading-[32px] font-serif ${isNarrator ? 'text-ink-secondary italic font-normal' : 'text-ink-primary font-normal'}`}>
                     {line.text}
                   </p>
 
                   {line.sound_cues.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1">
+                    <div className="mt-3 flex flex-wrap gap-1.5">
                       {line.sound_cues.map(c => (
-                        <span key={c.id} className="text-[10px] font-mono text-secondary bg-secondary-container/20 px-2 py-0.5 rounded border border-secondary/30">
+                        <span key={c.id} className="text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                           🎵 [{c.placement}: {c.tag}]
                         </span>
                       ))}
@@ -357,11 +358,11 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
 
       {/* Floating Audio Playback Controller Bar */}
       {hasRendered && (
-        <div className="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-6 py-3 shadow-2xl z-50">
-          <div className="max-w-5xl mx-auto flex flex-col gap-2">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-4xl bg-white/95 backdrop-blur-xl border border-border-hairline px-6 py-4 rounded-2xl shadow-[0_8px_30px_rgba(15,23,42,0.08)] z-50">
+          <div className="flex flex-col gap-2.5">
             {/* Scrubber Bar */}
             <div className="flex items-center gap-3">
-              <span className="text-xs font-mono text-slate-400 w-12 text-right">
+              <span className="text-xs font-mono text-ink-muted w-12 text-right">
                 {formatTime(currentTimeMs)}
               </span>
               <input
@@ -370,9 +371,9 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
                 max={durationMs || 100}
                 value={currentTimeMs}
                 onChange={handleSeek}
-                className="flex-1 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                className="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
               />
-              <span className="text-xs font-mono text-slate-400 w-12">
+              <span className="text-xs font-mono text-ink-muted w-12">
                 {formatTime(durationMs)}
               </span>
             </div>
@@ -383,8 +384,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
               <div className="flex items-center gap-3 w-1/4 truncate">
                 {activeLineId && (
                   <div className="text-xs truncate">
-                    <span className="font-semibold text-emerald-400">Now Speaking: </span>
-                    <span className="text-white">
+                    <span className="font-semibold text-primary">Now Speaking: </span>
+                    <span className="text-ink-primary font-medium">
                       {characterMap.get(script.lines.find(l => l.id === activeLineId)?.speaker_id || '')?.name || 'Narrator'}
                     </span>
                   </div>
@@ -395,7 +396,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => handleSkip(-5)}
-                  className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-900 transition"
+                  className="p-2 text-ink-secondary hover:text-ink-primary rounded-lg hover:bg-slate-100 transition cursor-pointer"
                   title="Rewind 5s"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -403,14 +404,14 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
 
                 <button
                   onClick={togglePlayPause}
-                  className="p-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-lg shadow-emerald-900/40 transition"
+                  className="p-3 bg-primary hover:bg-primary-container text-white rounded-full shadow-md shadow-emerald-900/20 transition cursor-pointer"
                 >
-                  {isPlaying ? <Pause className="w-5 h-5 fill-white" /> : <Play className="w-5 h-5 fill-white ml-0.5" />}
+                  {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
                 </button>
 
                 <button
                   onClick={() => handleSkip(5)}
-                  className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-900 transition"
+                  className="p-2 text-ink-secondary hover:text-ink-primary rounded-lg hover:bg-slate-100 transition cursor-pointer"
                   title="Forward 5s"
                 >
                   <RotateCw className="w-4 h-4" />
@@ -420,12 +421,12 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
               {/* Speed & Volume Controls */}
               <div className="flex items-center gap-4 w-1/4 justify-end">
                 {/* Speed buttons */}
-                <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-xs">
+                <div className="flex items-center bg-slate-100 border border-border-hairline rounded-lg p-0.5 text-xs">
                   {[0.75, 1.0, 1.25, 1.5].map((rate) => (
                     <button
                       key={rate}
                       onClick={() => handleRateChange(rate)}
-                      className={`px-2 py-0.5 rounded ${playbackRate === rate ? 'bg-emerald-600 text-white font-semibold' : 'text-slate-400 hover:text-white'}`}
+                      className={`px-2 py-0.5 rounded transition cursor-pointer ${playbackRate === rate ? 'bg-white text-ink-primary font-semibold shadow-sm' : 'text-ink-muted hover:text-ink-primary'}`}
                     >
                       {rate}x
                     </button>
@@ -434,7 +435,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
 
                 {/* Volume icon */}
                 <div className="flex items-center gap-2">
-                  <Volume2 className="w-4 h-4 text-slate-400" />
+                  <Volume2 className="w-4 h-4 text-ink-muted" />
                   <input
                     type="range"
                     min="0"
@@ -446,7 +447,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ script }) => {
                       setVolume(v);
                       if (audioRef.current) audioRef.current.volume = v;
                     }}
-                    className="w-16 h-1 bg-slate-800 rounded cursor-pointer accent-emerald-500"
+                    className="w-16 h-1 bg-slate-200 rounded cursor-pointer accent-primary"
                   />
                 </div>
               </div>

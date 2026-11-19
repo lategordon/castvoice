@@ -27,11 +27,9 @@ if [ ! -f "data/sound_library/rain.wav" ] || [ ! -f "data/sound_library/podcast_
     PYTHONPATH=backend ./venv/bin/python3 backend/app/services/generate_starter_sounds.py
 fi
 
-# Ensure frontend is built
-if [ ! -f "frontend/dist/index.html" ]; then
-    echo "Building frontend..."
-    cd frontend && npm install && npm run build && cd ..
-fi
+# Build frontend with latest changes
+echo "Compiling latest frontend UI..."
+(cd frontend && npm run build)
 
 # Determine configured port
 PORT=$(grep -E '^PORT=' .env 2>/dev/null | cut -d '=' -f2 | tr -d ' "\r' || echo "8000")

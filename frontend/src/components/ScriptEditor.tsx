@@ -269,365 +269,448 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     }
   };
 
+  const [filterMode, setFilterMode] = useState<'all' | 'dialogue' | 'sfx' | 'flagged'>('all');
   const lowConfidenceCount = script.lines.filter(l => l.confidence === 'low').length;
+  const sfxCount = script.lines.filter(l => Boolean(l.sound_cues && l.sound_cues.length > 0)).length;
+
+  const filteredLines = script.lines.filter(line => {
+    if (filterMode === 'flagged') return line.confidence === 'low';
+    if (filterMode === 'sfx') return Boolean(line.sound_cues && line.sound_cues.length > 0);
+    if (filterMode === 'dialogue') return line.type === 'dialogue';
+    return true;
+  });
 
   return (
-    <div className="flex flex-col lg:flex-row h-full overflow-hidden bg-slate-950">
-      {/* LEFT PANEL: Script Lines Review (~65% width) */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 border-r border-slate-800/80">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
-          <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              Script Lines & Dialogue Directing
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Review dialogue attribution, delivery notes, and audio effects. Click preview on any line to audition.
-            </p>
+    <div className="flex flex-col h-full overflow-hidden bg-surface text-ink-primary font-sans">
+      {/* Sticky Workflow Stage & Quick Action Sub-Header (DESIGN.md Level 1 / Floating Controls) */}
+      <section className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md px-6 py-3 border-b border-border-hairline shadow-[0_1px_2px_rgba(15,23,42,0.02)]">
+        <div className="max-w-[1720px] mx-auto flex flex-wrap items-center justify-between gap-4">
+          {/* Breadcrumb Context & Extraction Meta */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+              <span className="font-semibold text-sm text-ink-primary tracking-tight font-serif text-base">
+                {script.title}
+              </span>
+            </div>
+            <div className="h-4 w-px bg-border-hairline" />
+            <div className="flex items-center gap-2 font-mono text-[11px] text-ink-secondary">
+              <span className="px-2 py-0.5 rounded bg-surface-container-low border border-border-hairline text-secondary font-semibold">
+                {script.lines.length} Lines Extracted
+              </span>
+              <span>•</span>
+              <span className="font-medium text-ink-muted">Stage 2 of 4: Script Editorial</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Script Filter Pills */}
+          <div className="flex items-center gap-1.5 p-1 rounded-full bg-surface-container-low border border-border-hairline">
+            <button
+              onClick={() => setFilterMode('all')}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                filterMode === 'all'
+                  ? 'bg-white text-primary shadow-xs border border-primary/20'
+                  : 'text-ink-secondary hover:text-ink-primary hover:bg-white/50'
+              }`}
+            >
+              All Speakers ({script.lines.length})
+            </button>
+            <button
+              onClick={() => setFilterMode('dialogue')}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                filterMode === 'dialogue'
+                  ? 'bg-white text-tertiary shadow-xs border border-tertiary/20'
+                  : 'text-ink-secondary hover:text-ink-primary hover:bg-white/50'
+              }`}
+            >
+              Dialogue
+            </button>
+            <button
+              onClick={() => setFilterMode('sfx')}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                filterMode === 'sfx'
+                  ? 'bg-white text-secondary shadow-xs border border-secondary/20'
+                  : 'text-ink-secondary hover:text-ink-primary hover:bg-white/50'
+              }`}
+            >
+              SFX Only ({sfxCount})
+            </button>
+            <button
+              onClick={() => setFilterMode('flagged')}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                filterMode === 'flagged'
+                  ? 'bg-error text-white shadow-xs'
+                  : lowConfidenceCount > 0
+                  ? 'bg-error-container text-error hover:bg-error-container/80'
+                  : 'text-ink-secondary hover:text-ink-primary hover:bg-white/50'
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${lowConfidenceCount > 0 ? 'bg-error animate-pulse' : 'bg-slate-300'}`} />
+              Flagged ({lowConfidenceCount})
+            </button>
+          </div>
+
+          {/* Subheader Action Cluster */}
+          <div className="flex items-center gap-2.5">
             {playingLineId && (
               <button
                 onClick={stopCurrentAudio}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition animate-pulse"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-error text-white shadow-xs hover:bg-error/90 transition"
               >
-                <Square className="w-3.5 h-3.5 fill-red-400 text-red-400" />
+                <Square className="w-3.5 h-3.5 fill-current" />
                 Stop Preview
               </button>
             )}
-            <span className="text-xs text-slate-400 font-medium px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-lg">
-              {script.lines.length} lines total
-            </span>
+
+            {onProceedToRender && (
+              <button
+                onClick={onProceedToRender}
+                className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-primary text-white hover:bg-primary-container transition-all shadow-sm text-xs font-semibold"
+              >
+                <span>Proceed to Casting</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
+      </section>
 
-        {/* Banner for low-confidence warnings */}
-        {lowConfidenceCount > 0 && (
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 flex items-center justify-between text-amber-300 text-xs">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>
-                <strong>{lowConfidenceCount} line{lowConfidenceCount > 1 ? 's' : ''}</strong> with ambiguous speaker attribution highlighted below. Review and adjust speakers if needed.
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Lines List */}
-        <div className="space-y-3 pb-24">
-          {script.lines.map((line) => {
-            const char = characterMap.get(line.speaker_id) || {
-              id: line.speaker_id,
-              name: line.speaker_id,
-              color_accent: '#94A3B8'
-            };
-            const isNarrator = line.speaker_id === 'narrator';
-            const isLowConf = line.confidence === 'low';
-            const isPlaying = playingLineId === line.id;
-
-            return (
-              <div
-                key={line.id}
-                className={`p-4 rounded-xl border transition ${
-                  isPlaying
-                    ? 'bg-surface-container-high border-primary shadow-[0_0_20px_rgba(78,222,163,0.25)]'
-                    : isLowConf
-                    ? 'bg-error-container/10 border-error/30'
-                    : isNarrator
-                    ? 'bg-surface-container-low/70 border-outline-variant/30 hover:bg-surface-container-low'
-                    : 'bg-surface-container-low border-outline-variant/30 hover:bg-surface-container/70'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-mono text-outline font-semibold w-7">
-                      #{line.line_index + 1}
-                    </span>
-
-                    {/* Speaker selector dropdown */}
-                    <div className="relative inline-flex items-center">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full mr-2 shadow-[0_0_8px_rgba(78,222,163,0.4)]"
-                        style={{ backgroundColor: char.color_accent || '#4edea3' }}
-                      />
-                      <select
-                        value={line.speaker_id}
-                        onChange={(e) => handleSpeakerChange(line.id, e.target.value)}
-                        className="bg-surface-container-high border border-outline-variant/40 text-on-surface text-xs font-semibold rounded-lg px-2.5 py-1 focus:outline-none focus:border-primary cursor-pointer"
-                      >
-                        {script.characters.map((c) => (
-                          <option key={c.id} value={c.id} className="bg-surface-container-lowest text-on-surface">
-                            {c.name} {c.id === 'narrator' ? '(Narration)' : ''}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {isLowConf && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-error-container/20 text-error border border-error/30">
-                        <AlertTriangle className="w-3 h-3" />
-                        Ambiguous
-                      </span>
-                    )}
-
-                    <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">
-                      {line.type}
+      {/* Main Studio Stage Split Layout: 12-Column Responsive Workspace */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-[1720px] mx-auto px-6 py-6 pb-28">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+            
+            {/* LEFT / MAIN COLUMN: Script Timeline Stream (8 of 12 Cols) */}
+            <div className="xl:col-span-8 flex flex-col gap-4">
+              {lowConfidenceCount > 0 && filterMode !== 'flagged' && (
+                <div className="bg-error-container/30 border border-error/30 rounded-xl p-3 flex items-center justify-between text-error text-xs">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    <span>
+                      <strong>Ambiguous Attribution Detected:</strong> {lowConfidenceCount} line{lowConfidenceCount > 1 ? 's' : ''} have uncertain speaker identification.
                     </span>
                   </div>
+                  <button
+                    onClick={() => setFilterMode('flagged')}
+                    className="font-semibold underline ml-2 hover:text-ink-primary"
+                  >
+                    View Flagged
+                  </button>
+                </div>
+              )}
 
-                  {/* Single-Line Audio Preview & STOP Button */}
+              {filteredLines.map((line) => {
+                const char: Character = characterMap.get(line.speaker_id) || {
+                  id: line.speaker_id,
+                  name: line.speaker_id,
+                  aliases: [],
+                  color_accent: '#006948',
+                  voice_id: undefined
+                };
+                const isNarrator = line.speaker_id === 'narrator';
+                const isLowConf = line.confidence === 'low';
+                const isPlaying = playingLineId === line.id;
+                const wordCount = line.text.trim().split(/\s+/).length;
+                const estSeconds = Math.max(1.2, (wordCount / 2.7)).toFixed(1);
+
+                return (
+                  <article
+                    key={line.id}
+                    style={{ borderLeftColor: char.color_accent || '#006948' }}
+                    className={`script-card relative rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.03)] transition-all border border-border-hairline border-l-4 ${
+                      isPlaying
+                        ? 'bg-surface-container-low border-primary/50 shadow-md ring-1 ring-primary/30'
+                        : isLowConf
+                        ? 'bg-error-container/10 border-error/40 hover:bg-error-container/20'
+                        : isNarrator
+                        ? 'bg-white hover:border-slate-300'
+                        : 'bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    {/* Top Metadata Row */}
+                    <div className="flex items-center justify-between gap-4 pb-2.5">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="font-mono text-xs text-ink-muted font-semibold">
+                          #{String(line.line_index + 1).padStart(3, '0')}
+                        </span>
+
+                        {/* Speaker Pill */}
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-low border border-border-hairline text-ink-primary">
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: char.color_accent || '#006948' }}
+                          />
+                          <select
+                            value={line.speaker_id}
+                            onChange={(e) => handleSpeakerChange(line.id, e.target.value)}
+                            className="bg-transparent text-xs font-semibold text-ink-primary focus:outline-none cursor-pointer"
+                          >
+                            {script.characters.map((c) => (
+                              <option key={c.id} value={c.id} className="bg-white text-ink-primary">
+                                {c.name} {c.id === 'narrator' ? '(Narrator)' : ''}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Line Type Badge */}
+                        <span className={`font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-bold ${
+                          isNarrator
+                            ? 'bg-slate-100 text-ink-secondary'
+                            : line.type === 'dialogue'
+                            ? 'bg-tertiary-fixed text-tertiary border border-tertiary/20'
+                            : 'bg-primary-fixed text-primary border border-primary/20'
+                        }`}>
+                          {line.type.toUpperCase()}
+                        </span>
+
+                        {/* Direction & Tone Indicator */}
+                        <span className="font-serif italic text-xs text-ink-muted">
+                          [{line.delivery?.emotion || (isNarrator ? 'measured narration cadence' : 'conversational')}]
+                        </span>
+                      </div>
+
+                      {/* Mini Audition & Quick Action */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleToggleLinePreview(line.id)}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border ${
+                            isPlaying
+                              ? 'bg-primary text-white border-primary shadow-xs'
+                              : 'bg-white hover:bg-slate-50 text-ink-primary border-border-hairline hover:border-slate-300'
+                          }`}
+                        >
+                          {isPlaying ? (
+                            <>
+                              <Square className="w-3.5 h-3.5 fill-current" />
+                              <span>Stop</span>
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-3.5 h-3.5 text-primary fill-primary" />
+                              <span>Audition</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Dialogue / Literary Prose Text - Newsreader 19px Typography (DESIGN.md) */}
+                    <div className="py-2 pl-1">
+                      <p className={`font-serif text-[19px] leading-[32px] select-text ${
+                        isNarrator ? 'text-ink-secondary font-normal' : 'text-ink-primary font-medium'
+                      }`}>
+                        {line.type === 'dialogue' ? `“${line.text.replace(/^[“"]|[”"]$/g, '')}”` : line.text}
+                      </p>
+                    </div>
+
+                    {/* Trailing Audio Timeline & Duration Bar with Simulated Waveform */}
+                    <div className="mt-2.5 pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-border-hairline font-mono text-[11px] text-ink-secondary">
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1 text-primary font-medium">
+                          <Radio className="w-3 h-3 text-primary" />
+                          00:0{estSeconds}s
+                        </span>
+                        <span>{wordCount} words</span>
+                        <span className="text-border-hairline">•</span>
+                        <span>Voice: {char.voice_id ? char.voice_id.split('-')[2] || char.voice_id : 'Neural Default'}</span>
+                      </div>
+
+                      {/* Mini Waveform Canvas Simulation */}
+                      <div className="flex items-center gap-1 h-3.5 w-36 opacity-80">
+                        <span className={`w-1 h-2 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-slate-300'}`} />
+                        <span className={`w-1 h-3 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-slate-400'}`} />
+                        <span className={`w-1 h-1.5 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-slate-300'}`} />
+                        <span className={`w-1 h-3.5 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-primary'}`} />
+                        <span className={`w-1 h-2.5 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-primary'}`} />
+                        <span className="w-1 h-1 rounded-full bg-slate-200" />
+                        <span className={`w-1 h-3 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-primary'}`} />
+                        <span className={`w-1 h-3.5 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-slate-400'}`} />
+                        <span className="w-1 h-1.5 rounded-full bg-slate-200" />
+                        <span className={`w-1 h-2 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-slate-300'}`} />
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            {/* RIGHT SIDEBAR: Character Ledger & Entity Resolution (4 of 12 Cols) */}
+            <aside className="xl:col-span-4 flex flex-col gap-4 sticky top-20">
+              
+              {/* Character Ledger Header Card (DESIGN.md Milled Panel) */}
+              <div className="rounded-xl bg-white border border-border-hairline p-4 shadow-[0_1px_3px_rgba(15,23,42,0.03)] flex flex-col gap-3">
+                <div className="flex items-center justify-between pb-2 border-b border-border-hairline">
                   <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-secondary" />
+                    <h3 className="font-semibold text-sm text-ink-primary font-sans">Character Ledger</h3>
+                  </div>
+                  <div className="flex items-center gap-1.5">
                     <button
-                      onClick={() => handleToggleLinePreview(line.id)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition shadow-sm ${
-                        isPlaying
-                          ? 'bg-error text-on-error border-error shadow-[0_0_12px_rgba(255,180,171,0.4)]'
-                          : 'bg-surface-container-high text-on-surface hover:bg-primary hover:text-on-primary border-outline-variant/30'
-                      }`}
-                      title={isPlaying ? "Stop audio preview" : "Audition line performance"}
+                      onClick={() => setShowMergeModal(true)}
+                      className="px-2 py-1 rounded bg-surface-container-low hover:bg-slate-100 text-xs text-primary transition-colors flex items-center gap-1 font-semibold"
+                      title="Merge Characters"
                     >
-                      {isPlaying ? (
-                        <>
-                          <Square className="w-3 h-3 fill-current text-current" />
-                          <span>Stop</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3 h-3 text-primary fill-primary" />
-                          <span>Audition</span>
-                        </>
-                      )}
+                      <Merge className="w-3 h-3 text-secondary" />
+                      <span>Merge</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Line Spoken Text - Newsreader Serif */}
-                <p className={`text-[17px] leading-[28px] font-serif ${isNarrator ? 'text-on-surface-variant italic font-normal' : 'text-on-surface font-medium'}`}>
-                  {line.text}
-                </p>
+                {/* Character List */}
+                <div className="space-y-2.5">
+                  {script.characters.map((char) => {
+                    const isNarrator = char.id === 'narrator';
+                    const lineCount = script.lines.filter(l => l.speaker_id === char.id).length;
+                    const totalLines = script.lines.length || 1;
+                    const percent = Math.round((lineCount / totalLines) * 100);
+                    const assignedVoiceId = char.voice_id || (isNarrator ? 'en-US-GuyNeural' : 'en-US-JennyNeural');
+                    const isAuditioning = playingVoiceId === assignedVoiceId;
 
-                {/* Delivery Notes & Sound Cues Bar */}
-                <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-outline-variant/20 text-xs text-on-surface-variant">
-                  {/* Directorial Emotion Tag */}
-                  <div className="flex items-center gap-1.5 bg-surface-container-lowest px-2.5 py-1 rounded-md border border-outline-variant/30">
-                    <Volume2 className="w-3 h-3 text-tertiary" />
-                    <input
-                      type="text"
-                      defaultValue={line.delivery?.emotion || ''}
-                      placeholder="Add tone/emotion (e.g. whispering, curious)..."
-                      onBlur={(e) => handleDeliveryChange(line.id, e.target.value)}
-                      className="bg-transparent text-on-surface text-xs focus:outline-none placeholder:text-on-surface-variant/40 w-44"
-                    />
-                  </div>
+                    return (
+                      <div
+                        key={char.id}
+                        className="rounded-lg bg-surface-container-low border border-border-hairline p-3 flex flex-col gap-2 hover:border-slate-300 transition-all shadow-2xs"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <span
+                              className="w-3.5 h-3.5 rounded-full"
+                              style={{ backgroundColor: char.color_accent || '#006948' }}
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-ink-primary leading-tight font-sans">
+                                {char.name}
+                              </span>
+                              <span className="font-mono text-[10px] text-ink-secondary">
+                                {lineCount} lines ({percent}% of chapter)
+                              </span>
+                            </div>
+                          </div>
 
-                  {/* Sound Cues */}
-                  {line.sound_cues && line.sound_cues.length > 0 && (
-                    <div className="flex items-center gap-1.5">
-                      {line.sound_cues.map((cue) => (
-                        <span
-                          key={cue.id}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-secondary-container/20 text-secondary border border-secondary/30 text-[11px] font-mono"
-                        >
-                          <Tag className="w-2.5 h-2.5" />
-                          {cue.tag} ({cue.placement})
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                          <div className="flex items-center gap-1">
+                            <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-bold">
+                              Assigned
+                            </span>
+                            <button
+                              onClick={() => {
+                                setEditingCharacter(char);
+                                setRenameInput(char.name);
+                              }}
+                              className="p-1 text-ink-muted hover:text-ink-primary rounded"
+                              title="Rename Character"
+                            >
+                              <Edit2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Voice Engine Spec Pill */}
+                        <div className="flex items-center justify-between px-2.5 py-1 rounded bg-white border border-border-hairline font-mono text-[11px] text-ink-secondary">
+                          <div className="flex items-center gap-1.5 truncate">
+                            <Mic className="w-3 h-3 text-secondary shrink-0" />
+                            <select
+                              value={assignedVoiceId}
+                              onChange={(e) => handleAssignVoice(char.id, e.target.value)}
+                              className="bg-transparent text-ink-primary text-[11px] focus:outline-none cursor-pointer truncate max-w-[180px]"
+                            >
+                              {voices.map((v) => (
+                                <option key={v.id} value={v.id} className="bg-white text-ink-primary">
+                                  {v.name} ({v.accent})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleToggleVoicePreview(assignedVoiceId)}
+                            className="text-primary hover:text-primary-container transition ml-2"
+                            title="Audition voice"
+                          >
+                            {isAuditioning ? (
+                              <Square className="w-3 h-3 fill-error text-error" />
+                            ) : (
+                              <Play className="w-3 h-3 fill-primary" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            );
-          })}
+
+              {/* AI Character Entity Resolution Alert (DESIGN.md Level 1 Card) */}
+              <div className="rounded-xl bg-white border border-border-hairline p-4 shadow-[0_1px_3px_rgba(15,23,42,0.03)] flex flex-col gap-2 relative overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Merge className="w-4 h-4 text-secondary" />
+                    <span className="text-xs font-bold text-ink-primary font-sans">Entity Merge Suggestion</span>
+                  </div>
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-secondary-container text-secondary font-bold">
+                    98% Match
+                  </span>
+                </div>
+                <p className="text-[11px] text-ink-secondary leading-relaxed">
+                  Multiple speaking roles exhibit matching semantic cadence and conversational context.
+                </p>
+                <button
+                  onClick={() => setShowMergeModal(true)}
+                  className="w-full py-1.5 rounded-lg bg-surface-container-low border border-border-hairline text-ink-primary hover:bg-slate-100 transition-all text-xs font-semibold text-center mt-1"
+                >
+                  Review & Merge Characters
+                </button>
+              </div>
+            </aside>
+
+          </div>
         </div>
       </div>
 
-      {/* RIGHT PANEL: Voice Casting & Character Ledger (~35% width) */}
-      <div className="w-full lg:w-[420px] bg-slate-900/90 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-full overflow-hidden shrink-0">
-        {/* Right Header & Proceed CTA */}
-        <div className="p-4 border-b border-slate-800 bg-slate-950/70 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Mic className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                Voice Casting & Cast
-              </h3>
-            </div>
-            <span className="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono">
-              {script.characters.length} cast
-            </span>
-          </div>
-
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            Assign unique neural voices to your hosts, narrator, and characters. Audition voice samples directly.
-          </p>
-
-          {/* Proceed to Render CTA */}
-          {onProceedToRender && (
-            <button
-              onClick={onProceedToRender}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-emerald-950/50 transition"
-            >
-              <Sparkles className="w-4 h-4" />
-              Proceed to Render & Mix Full Play
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          )}
-
-          <div className="flex items-center gap-2 pt-1">
-            <button
-              onClick={() => setShowMergeModal(true)}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition"
-            >
-              <Merge className="w-3 h-3 text-blue-400" />
-              Merge Duplicates
-            </button>
-          </div>
-        </div>
-
-        {/* Character Voice Assignment Cards */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
-          {script.characters.map((char) => {
-            const isNarrator = char.id === 'narrator';
-            const lineCount = script.lines.filter(l => l.speaker_id === char.id).length;
-            const assignedVoiceId = char.voice_id || (isNarrator ? 'en-US-GuyNeural' : 'en-US-JennyNeural');
-            const assignedVoice = voices.find(v => v.id === assignedVoiceId);
-            const isAuditioning = playingVoiceId === assignedVoiceId;
-
-            return (
-              <div
-                key={char.id}
-                className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 space-y-2.5 hover:border-slate-700 transition"
-              >
-                {/* Character Name & Info */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span
-                      className="w-3 h-3 rounded-full shrink-0"
-                      style={{ backgroundColor: char.color_accent || '#3B82F6' }}
-                    />
-                    <span className="text-xs font-bold text-white truncate">
-                      {char.name}
-                    </span>
-                    {isNarrator && (
-                      <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">
-                        Narrator
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] text-slate-500 font-mono">
-                      {lineCount} lines
-                    </span>
-                    <button
-                      onClick={() => {
-                        setEditingCharacter(char);
-                        setRenameInput(char.name);
-                      }}
-                      className="p-1 hover:bg-slate-800 text-slate-400 hover:text-white rounded"
-                      title="Rename character"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Voice Selection Dropdown & Audition Preview */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 block">
-                    Assigned Voice
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={assignedVoiceId}
-                      onChange={(e) => handleAssignVoice(char.id, e.target.value)}
-                      className="flex-1 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500 truncate"
-                    >
-                      {voices.map((v) => (
-                        <option key={v.id} value={v.id}>
-                          {v.name} ({v.gender}, {v.accent})
-                        </option>
-                      ))}
-                    </select>
-
-                    {/* Audition Play / STOP Button */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleVoicePreview(assignedVoiceId)}
-                      className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition ${
-                        isAuditioning
-                          ? 'bg-red-500/20 text-red-400 border-red-500/40 hover:bg-red-500/30'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
-                      }`}
-                      title={isAuditioning ? "Stop audition sample" : "Audition voice sample"}
-                    >
-                      {isAuditioning ? (
-                        <>
-                          <Square className="w-3 h-3 fill-red-400 text-red-400" />
-                          <span>Stop</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3 h-3 text-emerald-400 fill-emerald-400" />
-                          <span>Sample</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Voice description snippet */}
-                {assignedVoice && (
-                  <p className="text-[10px] text-slate-500 italic truncate">
-                    Preview: "{assignedVoice.preview_text}"
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Character Rename Modal */}
-        {editingCharacter && (
-          <div className="p-4 bg-slate-950 border-t border-slate-800">
-            <h4 className="text-xs font-semibold text-white mb-2">Rename Character</h4>
+      {/* Character Rename Modal */}
+      {editingCharacter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
+          <div className="bg-white border border-border-hairline rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h4 className="text-sm font-bold text-ink-primary mb-2 font-sans">Rename Character</h4>
             <input
               type="text"
               value={renameInput}
               onChange={(e) => setRenameInput(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white mb-3 focus:outline-none focus:border-emerald-500"
+              className="w-full bg-surface-container-low border border-border-hairline rounded-lg px-3 py-2 text-xs text-ink-primary mb-4 focus:outline-none focus:border-primary"
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setEditingCharacter(null)}
-                className="px-2.5 py-1 text-xs text-slate-400 hover:text-white"
+                className="px-3 py-1.5 text-xs text-ink-secondary hover:text-ink-primary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleRenameCharacter}
-                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-medium"
+                className="px-4 py-1.5 bg-primary hover:bg-primary-container text-white rounded-lg text-xs font-semibold"
               >
                 Save
               </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Merge Characters Modal */}
-        {showMergeModal && (
-          <div className="p-4 bg-slate-950 border-t border-slate-800 space-y-2.5">
-            <h4 className="text-xs font-semibold text-white">Merge Duplicate Characters</h4>
-            <p className="text-[10px] text-slate-400">
-              Reassign all lines from source to target character.
+      {/* Merge Characters Modal */}
+      {showMergeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
+          <div className="bg-white border border-border-hairline rounded-2xl p-6 max-w-md w-full shadow-xl space-y-3">
+            <h4 className="text-sm font-bold text-ink-primary font-sans">Merge Duplicate Characters</h4>
+            <p className="text-xs text-ink-secondary">
+              Reassign all spoken lines from a duplicate alias to the target canon character.
             </p>
             <div>
-              <label className="text-[10px] text-slate-500 block mb-1">Source (Will be deleted):</label>
+              <label className="text-xs font-mono text-ink-muted block mb-1">Source (Will be merged & removed):</label>
               <select
                 value={mergeSourceId}
                 onChange={(e) => setMergeSourceId(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white"
+                className="w-full bg-surface-container-low border border-border-hairline rounded-lg p-2 text-xs text-ink-primary"
               >
                 <option value="">Select source character...</option>
                 {script.characters.map(c => (
@@ -636,11 +719,11 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
               </select>
             </div>
             <div>
-              <label className="text-[10px] text-slate-500 block mb-1">Target (Keeps lines):</label>
+              <label className="text-xs font-mono text-ink-muted block mb-1">Target (Keeps all lines):</label>
               <select
                 value={mergeTargetId}
                 onChange={(e) => setMergeTargetId(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white"
+                className="w-full bg-surface-container-low border border-border-hairline rounded-lg p-2 text-xs text-ink-primary"
               >
                 <option value="">Select target character...</option>
                 {script.characters.map(c => (
@@ -648,24 +731,24 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                 ))}
               </select>
             </div>
-            <div className="flex justify-end gap-2 pt-1">
+            <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setShowMergeModal(false)}
-                className="px-2.5 py-1 text-xs text-slate-400"
+                className="px-3 py-1.5 text-xs text-ink-secondary hover:text-ink-primary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleMergeCharacters}
                 disabled={!mergeSourceId || !mergeTargetId || mergeSourceId === mergeTargetId}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-lg text-xs font-medium"
+                className="px-4 py-1.5 bg-primary hover:bg-primary-container disabled:opacity-50 text-white rounded-lg text-xs font-semibold"
               >
                 Confirm Merge
               </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

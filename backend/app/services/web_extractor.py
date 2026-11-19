@@ -143,10 +143,22 @@ class WebArticleExtractor:
         "User-Agent": (
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/124.0.0.0 Safari/537.36"
+            "Chrome/131.0.0.0 Safari/537.36"
         ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
+        "Sec-Ch-Ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"macOS"',
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "cross-site",
+        "Upgrade-Insecure-Requests": "1",
+    }
+
+    FALLBACK_HEADERS = {
+        "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     }
 
     @classmethod
@@ -223,28 +235,33 @@ class WebArticleExtractor:
         if not re.match(r"^https?://", url.strip(), re.IGNORECASE):
             url = "https://" + url.strip()
 
-        req = urllib.request.Request(url, headers=cls.HEADERS)
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as response:
-                content_type = response.headers.get("Content-Type", "")
-                charset = "utf-8"
-                if "charset=" in content_type.lower():
-                    charset = content_type.lower().split("charset=")[-1].split(";")[0].strip()
+        for headers in [cls.HEADERS, cls.FALLBACK_HEADERS]:
+            req = urllib.request.Request(url, headers=headers)
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as response:
+                    content_type = response.headers.get("Content-Type", "")
+                    charset = "utf-8"
+                    if "charset=" in content_type.lower():
+                        charset = content_type.lower().split("charset=")[-1].split(";")[0].strip()
 
-                raw_bytes = response.read()
-                try:
-                    html_content = raw_bytes.decode(charset, errors="replace")
-                except Exception:
-                    html_content = raw_bytes.decode("utf-8", errors="replace")
+                    raw_bytes = response.read()
+                    try:
+                        html_content = raw_bytes.decode(charset, errors="replace")
+                    except Exception:
+                        html_content = raw_bytes.decode("utf-8", errors="replace")
 
-                data = cls.extract_from_html(html_content, url=url)
-                if not data["text"].strip():
-                    raise ValueError("Could not extract article text from this webpage. The page may require JavaScript or authentication.")
-                return data
-
-        except urllib.error.HTTPError as e:
-            raise ValueError(f"HTTP {e.code} error while accessing URL: {e.reason}")
-        except urllib.error.URLError as e:
-            raise ValueError(f"Could not connect to URL: {e.reason}")
-        except TimeoutError:
-            raise ValueError("Connection timed out while fetching the webpage.")
+                    data = cls.extract_from_html(html_content, url=url)
+                    if not data["text"].strip():
+                        raise ValueError("Could not extract article text from this webpage. The page may require JavaScript or authentication.")
+                    return data
+            except urllib.error.HTTPError as e:
+                if e.code == 403 and headers is cls.HEADERS:
+                    # Retry with fallback bot headers
+                    continue
+                if e.code == 403:
+                    raise ValueError("This website blocks automated scraping (HTTP 403 Forbidden). Please paste the article text or markdown directly into the text box below.")
+                raise ValueError(f"HTTP {e.code} error while accessing URL: {e.reason}")
+            except urllib.error.URLError as e:
+                raise ValueError(f"Could not connect to URL: {e.reason}")
+            except TimeoutError:
+                raise ValueError("Connection timed out while fetching the webpage.")

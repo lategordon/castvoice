@@ -1,6 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: "class",
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -8,40 +7,53 @@ export default {
   theme: {
     extend: {
       colors: {
-        surface: "#0c1322",
-        "surface-container": "#191f2f",
-        "surface-container-low": "#141b2b",
-        "surface-container-high": "#232a3a",
-        "surface-container-highest": "#2e3545",
-        "surface-container-lowest": "#070e1d",
-        "on-surface": "#dce2f7",
-        "on-surface-variant": "#bbcabf",
-        "outline-variant": "#3c4a42",
-        outline: "#86948a",
+        surface: "#f8f9ff",
+        "surface-dim": "#cbdbf5",
+        "surface-bright": "#f8f9ff",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-low": "#eff4ff",
+        "surface-container": "#e5eeff",
+        "surface-container-high": "#dce9ff",
+        "surface-container-highest": "#d3e4fe",
+        "on-surface": "#0b1c30",
+        "on-surface-variant": "#3d4a42",
+        "inverse-surface": "#213145",
+        "inverse-on-surface": "#eaf1ff",
+        outline: "#6d7a72",
+        "outline-variant": "#bccac0",
+        "border-hairline": "#e2e8f0",
+        "ink-primary": "#0f172a",
+        "ink-secondary": "#334155",
+        "ink-muted": "#64748b",
         primary: {
-          DEFAULT: "#4edea3",
-          container: "#10b981",
-          fixed: "#6ffbbe",
-          "on-container": "#00422b",
+          DEFAULT: "#006948",
+          container: "#00855d",
+          fixed: "#85f8c4",
+          "fixed-dim": "#68dba9",
+          "on-container": "#f5fff7",
         },
         secondary: {
-          DEFAULT: "#4cd7f6",
-          container: "#03b5d3",
-          fixed: "#acedff",
+          DEFAULT: "#515f74",
+          container: "#d5e3fd",
+          fixed: "#d5e3fd",
+          "on-container": "#57657b",
         },
         tertiary: {
-          DEFAULT: "#d0bcff",
-          container: "#b090ff",
+          DEFAULT: "#006194",
+          container: "#007bb9",
+          fixed: "#cce5ff",
+          "on-container": "#fdfcff",
         },
         error: {
-          DEFAULT: "#ffb4ab",
-          container: "#93000a",
+          DEFAULT: "#ba1a1a",
+          container: "#ffdad6",
+          "on-container": "#93000a",
         }
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
         serif: ['Newsreader', 'serif'],
-        mono: ['monospace']
+        mono: ['"JetBrains Mono"', 'monospace']
       }
     },
   },

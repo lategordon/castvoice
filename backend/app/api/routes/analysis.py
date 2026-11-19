@@ -19,6 +19,7 @@ class AnalyzeRequest(BaseModel):
     podcast_format: str = "single_episode"  # "single_episode", "multi_part"
     host1_name: str = "Alex"
     host2_name: str = "Jordan"
+    article_type: Optional[str] = "longform"  # "longform", "news", "investigative", "editorial", "technical"
 
 
 class AnalyzeResponse(BaseModel):
